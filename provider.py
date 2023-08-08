@@ -209,6 +209,8 @@ def calc_cagr(rev_growth_array, N):
   return round(np.sign(final_val)*100*(np.abs(final_val/1)**(1/N) - 1), 2)
 
 def write_batch_mode_csv(fname, data):
+  if not os.path.exists('./batch_mode_files/results'):
+    os.mkdir('./batch_mode_files/results')
   csv_header = ['stock', 'fair_value', 'current_price', 'upside/(downside)', \
                 'assumed_revenue_growth(%)', 'assumed_fcf_margin (%)', \
                 'current_price_rev_growth (%)', 'current_price_fcf_margin (%)', \
