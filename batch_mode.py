@@ -41,7 +41,7 @@ Stock_Ticker  , Rev_Growth_Estimate, FCF_Margin_Estimate
 import numpy as np
 import yfinance as yf
 import argparse
-import os, csv
+import csv
 import pandas as pd
 from tabulate import tabulate
 from provider import *
