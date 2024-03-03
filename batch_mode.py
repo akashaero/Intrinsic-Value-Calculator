@@ -46,6 +46,8 @@ import os, csv
 import pandas as pd
 from tabulate import tabulate
 from provider import *
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Calculate Intrinsic Value of Businesses Using Batch Mode!')

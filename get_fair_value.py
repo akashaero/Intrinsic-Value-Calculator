@@ -38,6 +38,8 @@ import yfinance as yf
 from scipy.optimize import minimize_scalar
 import argparse
 from provider import *
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # Parse user arguments
 parser = argparse.ArgumentParser(description='Calculate Intrinsic Value of A Business!')
