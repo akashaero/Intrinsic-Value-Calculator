@@ -126,7 +126,7 @@ python batch_mode.py --gen_file <ticker_text_file>
 #### Arguments
 
 **- -gen_file**  : Switches on the CSV file generation for batch mode
-**ticker_text_file**  : File of ticker list in "./ticker_groups" folder.
+**ticker_text_file**  : File of ticker list in "./ticker_groups" folder
 
 #### Examples
 
