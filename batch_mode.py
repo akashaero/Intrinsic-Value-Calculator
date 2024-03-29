@@ -54,9 +54,9 @@ if __name__ == '__main__':
   # Optional arguments with default values
   parser.add_argument("--N", type=int, default=7, \
                help="Number of years to run this analysis for (Default 7 Years).")
-  parser.add_argument("--rrr", type=float, default=10, \
+  parser.add_argument("--rrr", type=np.float32, default=10, \
                help="Required Rate of Return (Default 10%).")
-  parser.add_argument("--tgr", type=float, default=2.5, \
+  parser.add_argument("--tgr", type=np.float32, default=2.5, \
                help="Terminal Growth Rate (Default 2.5%).")
   parser.add_argument('-gen_file', '--gen_file', action='store_true')
   args = parser.parse_args()
@@ -91,7 +91,10 @@ if __name__ == '__main__':
   else:
     # Read CSV
     data = pd.read_csv('./batch_mode_files/'+args.file, index_col=0)
-    
+    # data['FCF_Margin_Estimate (%)'] = data['FCF_Margin_Estimate (%)'].astype(np.float32)
+    # data['Rev_Growth_Estimate (%)'] = data['Rev_Growth_Estimate (%)'].astype(np.float32)
+    # exit()
+
     # Run subprocesses in silent mode
     csv_list = []
     for t in data.index:
