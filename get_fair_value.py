@@ -28,9 +28,9 @@ To silent the terminal output (especially in batch mode), use -S flag
 examples of usage:
 $ python get_fair_value.py intc 12.2 20
 or
-$ python get_fair_value.py INTC 12.2 20.0 --N 7 --rrr 0.1 --tgr 0.025
+$ python get_fair_value.py INTC 12.2 20.0 --N 7 --rrr 10 --tgr 2.5
 or
-$ python get_fair_value.py INTC 12.2 20 --N 7 --rrr 0.1 --tgr 0.025 -S
+$ python get_fair_value.py INTC 12.2 20 --N 7 --rrr 10 --tgr 2.5 -S
 '''
 
 import numpy as np
