@@ -200,6 +200,33 @@ def print_calculated_info(results, current_price, fcf_margins, prev_rev_growth, 
   print('  or     you get {}% annualized return for next {} years compared to assumed {}% '\
         .format(r_wacc, n_future_years, wacc))
 
+def get_calculated_info(results, current_price, fcf_margins, prev_rev_growth, \
+                          prev_fcf_margin, tkr, tgr, wacc, n_future_years):
+  fv, r_rg, r_wacc, r_fcf, rev_growth = results
+  if np.array([fcf_margins]).shape == (1,):
+    pass
+  else:
+    fcf_margins = np.average(np.array(fcf_margins))
+
+  out_str = ''
+  out_str += ('Based on your inputs, for next {} years,'.format(n_future_years))
+  out_str += ('Assuming {}% of average annual revenue growth,'.format(rev_growth))
+  out_str += ('         {}% of free cash flow margin, and'.format(fcf_margins))
+  out_str += ('         {}% of terminal growth rate,\n'.format(tgr))
+  out_str += ('The fair value for {} stock is ${} to get {}% of annualized return for next {} years.'\
+        .format(tkr, fv, wacc, n_future_years))
+  out_str += ('\nBased on previous close price of ${}, the upside/downside is {}%'\
+       .format(current_price, calc_up_downside(fv, current_price)))
+  out_str += ('\nTo justify the current stock price of ${}, Either,'\
+        .format(current_price))
+  out_str += ('{} would have to grow at {}% average annual rate for next {} years'\
+        .format(tkr, r_rg, n_future_years))
+  out_str += ('  or     have free cash flow margin of {}%'\
+        .format(r_fcf))
+  out_str += ('  or     you get {}% annualized return for next {} years compared to assumed {}% '\
+        .format(r_wacc, n_future_years, wacc))
+  return out_str
+
 def calc_cagr(rev_growth_array, N):
   if np.array([rev_growth_array]).shape == (1,):
     return round(100*rev_growth_array, 2)
