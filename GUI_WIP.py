@@ -33,8 +33,7 @@ class DCFApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Intrinsic Value Calculator")
-        # self.setStyleSheet("background-color: #000000; color: #ffffff;")
-        self.setMinimumSize(900, 800)
+        self.setMinimumSize(700, 800)
 
         # Match the current OS theme
         qdarktheme.setup_theme("dark")
@@ -45,7 +44,7 @@ class DCFApp(QMainWindow):
         self.setWindowIcon(my_icon)
 
         # Load font
-        self.font = QFont("Courier New", 14)
+        self.font = QFont("Courier", 12)
 
         # Create widgets
         self.input_frame = QWidget()
@@ -63,21 +62,20 @@ class DCFApp(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def create_input_frame(self):
-        theme_layout = QHBoxLayout()
+        theme_layout = QGridLayout()
         final_layout = QVBoxLayout()
         prefinal_layout = QVBoxLayout() 
         upper_layout = QGridLayout()
 
-        self.sl = QSlider(Qt.Horizontal)
-        self.sl.setMinimum(0)
-        self.sl.setMaximum(1)
-        self.sl.setValue(0)
-        self.sl.setTickPosition(QSlider.TicksBelow)
-        self.sl.setTickInterval(1)
-        self.sl.valueChanged.connect(self.valuechange)
-        theme_layout.addWidget(QLabel("Dark Mode"))
-        theme_layout.addWidget(self.sl)
-        theme_layout.addWidget(QLabel("Light Mode"))
+        self.toggle_button = QPushButton("Turn Dark Mode OFF")
+        self.toggle_button.setFont(QFont("Courier New", 10))
+        self.toggle_button.setStyleSheet("background-color: #333333; color: #ffffff; padding: 6px; border-radius: 10px;")
+        self.toggle_button.setIconSize(QSize(24, 24))
+        self.toggle_button.clicked.connect(self.valuechange)
+        theme_layout.addWidget(self.toggle_button, 0, 0)
+        theme_layout.addWidget(QLabel("\t"), 0, 1)
+        theme_layout.addWidget(QLabel("\t"), 0, 2)
+        theme_layout.addWidget(QLabel("\t"), 0, 3)
                 
         # Ticker input
         ticker_layout = QHBoxLayout()
@@ -140,34 +138,34 @@ class DCFApp(QMainWindow):
         info_layout = QVBoxLayout()
         self.info_text = QTextEdit()
         self.info_text.setFont(self.font)
-        # self.info_text.setStyleSheet("background-color: #333333; color: #ffffff;")
         self.info_text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.info_text.setReadOnly(True)
         info_layout.addWidget(self.info_text, alignment=Qt.AlignBottom)
 
         # Buttons
         button_layout = QHBoxLayout()
-        calculate_button = QPushButton("Calculate Fair Value")
-        calculate_button.setFont(self.font)
-        calculate_button.setStyleSheet("background-color: #333333; color: #ffffff; padding: 10px; border-radius: 5px;")
-        calculate_button.setIconSize(QSize(24, 24))
-        calculate_button.clicked.connect(self.calculate_dcf)
+
+        self.calculate_button = QPushButton("Calculate Fair Value")
+        self.calculate_button.setFont(self.font)
+        self.calculate_button.setStyleSheet("QPushButton { background-color: #333333; color: #ffffff; } QPushButton::pressed { background-color: light-blue }; padding: 8px; border-radius: 10px;")
+        self.calculate_button.setIconSize(QSize(24, 24))
+        self.calculate_button.clicked.connect(self.calculate_dcf)
         
-        reset_button = QPushButton("Reset")
-        reset_button.setFont(self.font)
-        reset_button.setStyleSheet("background-color: #333333; color: #ffffff; padding: 10px; border-radius: 5px;")
-        reset_button.setIconSize(QSize(24, 24))
-        reset_button.clicked.connect(self.reset_fields)
+        self.reset_button = QPushButton("Reset")
+        self.reset_button.setFont(self.font)
+        self.reset_button.setStyleSheet("QPushButton { background-color: #333333; color: #ffffff; } QPushButton::pressed { background-color: light-blue }; padding: 8px; border-radius: 10px;")
+        self.reset_button.setIconSize(QSize(24, 24))
+        self.reset_button.clicked.connect(self.reset_fields)
 
-        populate_button = QPushButton("Populate Info")
-        populate_button.setFont(self.font)
-        populate_button.setStyleSheet("background-color: #333333; color: #ffffff; padding: 10px; border-radius: 5px;")
-        populate_button.setIconSize(QSize(24, 24))
-        populate_button.clicked.connect(self.populate_info)
+        self.populate_button = QPushButton("Populate Info")
+        self.populate_button.setFont(self.font)
+        self.populate_button.setStyleSheet("QPushButton { background-color: #333333; color: #ffffff; } QPushButton::pressed { background-color: light-blue }; padding: 8px; border-radius: 10px;")
+        self.populate_button.setIconSize(QSize(24, 24))
+        self.populate_button.clicked.connect(self.populate_info)
 
-        button_layout.addWidget(reset_button)
-        button_layout.addWidget(calculate_button)
-        button_layout.addWidget(populate_button)
+        button_layout.addWidget(self.reset_button)
+        button_layout.addWidget(self.calculate_button)
+        button_layout.addWidget(self.populate_button)
 
         # Start Arranging Layouts in Input Frame
         upper_layout.addLayout(ticker_layout, 0, 0)
@@ -277,18 +275,13 @@ class DCFApp(QMainWindow):
 
         self.output_frame.setLayout(output_layout)
 
-    def enable_dark_mode(self):
-        qdarktheme.setup_theme("dark")
-
-    def enable_light_mode(self):
-        qdarktheme.setup_theme("light")
-
     def valuechange(self):
-        size = self.sl.value()
-        if size == 0:
-            qdarktheme.setup_theme("dark")
-        else:
+        if self.toggle_button.text() == "Turn Dark Mode OFF":
             qdarktheme.setup_theme("light")
+            self.toggle_button.setText("Turn Dark Mode ON")
+        else:
+            qdarktheme.setup_theme("dark")
+            self.toggle_button.setText("Turn Dark Mode OFF")
 
     def populate_info(self):
         self.info_text.clear()
