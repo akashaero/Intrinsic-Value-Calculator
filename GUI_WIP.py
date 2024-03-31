@@ -21,11 +21,12 @@ import yfinance as yf
 import pandas as pd
 from scipy.optimize import minimize_scalar
 from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QPlainTextEdit, QSizePolicy, QToolButton, QGridLayout, QTextEdit, QTableWidgetItem
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QPlainTextEdit, QSizePolicy, QToolButton, QGridLayout, QTextEdit, QTableWidgetItem, QSlider
 from PySide6.QtGui import QFont, QFontDatabase, QIcon, QHoverEvent
 from PySide6.QtCore import Qt, QSize, QEvent
 from provider import *
 import warnings
+import qdarktheme
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class DCFApp(QMainWindow):
@@ -34,6 +35,14 @@ class DCFApp(QMainWindow):
         self.setWindowTitle("Intrinsic Value Calculator")
         # self.setStyleSheet("background-color: #000000; color: #ffffff;")
         self.setMinimumSize(900, 800)
+
+        # Match the current OS theme
+        qdarktheme.setup_theme("dark")
+
+        # Set icon
+        my_icon = QIcon()
+        my_icon.addFile('logo/llama_stocks.jpeg')
+        self.setWindowIcon(my_icon)
 
         # Load font
         self.font = QFont("Courier New", 14)
@@ -54,10 +63,22 @@ class DCFApp(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def create_input_frame(self):
+        theme_layout = QHBoxLayout()
         final_layout = QVBoxLayout()
         prefinal_layout = QVBoxLayout() 
         upper_layout = QGridLayout()
-        
+
+        self.sl = QSlider(Qt.Horizontal)
+        self.sl.setMinimum(0)
+        self.sl.setMaximum(1)
+        self.sl.setValue(0)
+        self.sl.setTickPosition(QSlider.TicksBelow)
+        self.sl.setTickInterval(1)
+        self.sl.valueChanged.connect(self.valuechange)
+        theme_layout.addWidget(QLabel("Dark Mode"))
+        theme_layout.addWidget(self.sl)
+        theme_layout.addWidget(QLabel("Light Mode"))
+                
         # Ticker input
         ticker_layout = QHBoxLayout()
         ticker_label = QLabel("Ticker:    ")
@@ -118,7 +139,7 @@ class DCFApp(QMainWindow):
         # Information Layout
         info_layout = QVBoxLayout()
         self.info_text = QTextEdit()
-        self.info_text.setFont(QFont("Courier New", 16))
+        self.info_text.setFont(self.font)
         # self.info_text.setStyleSheet("background-color: #333333; color: #ffffff;")
         self.info_text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.info_text.setReadOnly(True)
@@ -156,6 +177,7 @@ class DCFApp(QMainWindow):
         upper_layout.addLayout(wacc_layout, 4, 0)
         upper_layout.addLayout(tgr_layout, 5, 0)
 
+        prefinal_layout.addLayout(theme_layout)
         prefinal_layout.addLayout(upper_layout)
         prefinal_layout.addLayout(info_layout)
 
@@ -170,9 +192,11 @@ class DCFApp(QMainWindow):
         # Fair Value Output Box
         fv_layout = QHBoxLayout()
         fv_label = QLabel("Fair Value:    ")
-        fv_label.setFont(self.font)
+        fv_label.setFont(QFont("Courier New", 18))
+        fv_label.setStyleSheet("font-weight: bold")
         self.fv_entry = QLineEdit()
-        self.fv_entry.setFont(self.font)
+        self.fv_entry.setFont(QFont("Courier New", 18))
+        self.fv_entry.setStyleSheet("font-weight: bold")
         self.fv_entry.setReadOnly(True)
         fv_layout.addWidget(fv_label, alignment=Qt.AlignRight)
         fv_layout.addWidget(self.fv_entry, alignment=Qt.AlignLeft)
@@ -200,6 +224,7 @@ class DCFApp(QMainWindow):
         rev_dcf_layout = QVBoxLayout()
         self.rev_dcf_start = QLabel("\nTo Justify the Current Price")
         self.rev_dcf_start.setFont(self.font)
+        self.rev_dcf_start.setStyleSheet("font-weight: bold")
         self.rev_dcf_start.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         rrev_layout = QHBoxLayout()
@@ -229,7 +254,7 @@ class DCFApp(QMainWindow):
         self.sep2.setFont(self.font)
 
         rwacc_layout = QHBoxLayout()
-        self.rev_wacc = QLabel("Obtained Compounded Return Rate for Selected Number of Years (%):     ")
+        self.rev_wacc = QLabel("Obtained Compounded Return Rate for Selected Number of Years:     ")
         self.rev_wacc.setFont(self.font)
         self.rwacc_entry = QLineEdit()
         self.rwacc_entry.setFont(self.font)
@@ -251,6 +276,19 @@ class DCFApp(QMainWindow):
         output_layout.addLayout(rev_dcf_layout, 3, 0)
 
         self.output_frame.setLayout(output_layout)
+
+    def enable_dark_mode(self):
+        qdarktheme.setup_theme("dark")
+
+    def enable_light_mode(self):
+        qdarktheme.setup_theme("light")
+
+    def valuechange(self):
+        size = self.sl.value()
+        if size == 0:
+            qdarktheme.setup_theme("dark")
+        else:
+            qdarktheme.setup_theme("light")
 
     def populate_info(self):
         self.info_text.clear()
@@ -283,7 +321,6 @@ class DCFApp(QMainWindow):
             for line in lines:
                 self.info_text.append(line)
                 self.info_text.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-            self.info_text.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
             results = dcf(rev_growth_rate, fcf_margin, nyears, starting_rev, wacc, tgr, total_shares, current_price)
             fair_value, req_rg, req_wacc, req_fcf, curr_rev_growth = results
             self.fv_entry.setText("$"+str(fair_value))
