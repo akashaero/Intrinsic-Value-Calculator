@@ -84,9 +84,9 @@ def get_info(ticker):
   table_data.append(make_list('Dilution(+)/Buybacks(-)', buybacks))
   table_data.append(make_list('FCF Margins', fcf_margins))
   table_data.append(['Analyst Expected Growth (5Y)', analyst_growth, '-', '-'])
-  print(tabulate(table_data, headers=header))
-  time.sleep(2.5) # Limit 2 requests per 5 seconds
-  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin
+  # print(tabulate(table_data, headers=header))
+  # time.sleep(2.5) # Limit 2 requests per 5 seconds
+  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, tabulate(table_data, headers=header)
 
 def dcf(rev_growth_array, fcf_margins_array, n_future_years, latest_revenue, \
         wacc, tgr, total_shares, current_price, reverse_dcf_mode=False):
