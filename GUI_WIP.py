@@ -33,7 +33,7 @@ class DCFApp(QMainWindow):
         super().__init__()
         self.setWindowTitle("Intrinsic Value Calculator")
         # self.setStyleSheet("background-color: #000000; color: #ffffff;")
-        self.setMinimumSize(900, 600)
+        self.setMinimumSize(900, 800)
 
         # Load font
         self.font = QFont("Courier New", 14)
@@ -78,7 +78,7 @@ class DCFApp(QMainWindow):
 
         # FCF margin input
         fcf_margin_layout = QHBoxLayout()
-        fcf_margin_label = QLabel("FCF Margin (%):    ")
+        fcf_margin_label = QLabel("Free Cash Flow (FCF) Margin (%):    ")
         fcf_margin_label.setFont(self.font)
         self.fcf_margin_entry = QLineEdit()
         self.fcf_margin_entry.setFont(self.font)
@@ -165,7 +165,7 @@ class DCFApp(QMainWindow):
         self.input_frame.setLayout(final_layout)
 
     def create_output_frame(self):
-        output_layout = QVBoxLayout()
+        output_layout = QGridLayout()
         
         # Fair Value Output Box
         fv_layout = QHBoxLayout()
@@ -176,7 +176,6 @@ class DCFApp(QMainWindow):
         self.fv_entry.setReadOnly(True)
         fv_layout.addWidget(fv_label, alignment=Qt.AlignRight)
         fv_layout.addWidget(self.fv_entry, alignment=Qt.AlignLeft)
-        output_layout.addLayout(fv_layout)
 
         # Current Price Output Box
         cp_layout = QHBoxLayout()
@@ -187,7 +186,6 @@ class DCFApp(QMainWindow):
         self.cp_entry.setReadOnly(True)
         cp_layout.addWidget(cp_label, alignment=Qt.AlignRight)
         cp_layout.addWidget(self.cp_entry, alignment=Qt.AlignLeft)
-        output_layout.addLayout(cp_layout)
         
         # Upside/Downside Output Box
         ud_layout = QHBoxLayout()
@@ -198,7 +196,59 @@ class DCFApp(QMainWindow):
         self.ud_entry.setReadOnly(True)
         ud_layout.addWidget(ud_label, alignment=Qt.AlignRight)
         ud_layout.addWidget(self.ud_entry, alignment=Qt.AlignLeft)
-        output_layout.addLayout(ud_layout)
+
+        rev_dcf_layout = QVBoxLayout()
+        self.rev_dcf_start = QLabel("\nTo Justify the Current Price")
+        self.rev_dcf_start.setFont(self.font)
+        self.rev_dcf_start.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        rrev_layout = QHBoxLayout()
+        self.rev_revenue = QLabel("Required Revenue Growth at Current FCF Margin (%):     ")
+        self.rev_revenue.setFont(self.font)
+        self.rrev_entry = QLineEdit()
+        self.rrev_entry.setFont(self.font)
+        self.rrev_entry.setReadOnly(True)
+        self.rev_revenue.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        rrev_layout.addWidget(self.rev_revenue, alignment=Qt.AlignLeft)
+        rrev_layout.addWidget(self.rrev_entry, alignment=Qt.AlignRight)
+
+        self.sep1 = QLabel(" Or ")
+        self.sep1.setFont(self.font)
+
+        rfcf_layout = QHBoxLayout()
+        self.rev_fcf = QLabel("Required Free Cash Flow Margin at Current Revenue Growth (%):     ")
+        self.rev_fcf.setFont(self.font)
+        self.rfcf_entry = QLineEdit()
+        self.rfcf_entry.setFont(self.font)
+        self.rfcf_entry.setReadOnly(True)
+        self.rev_fcf.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        rfcf_layout.addWidget(self.rev_fcf, alignment=Qt.AlignLeft)
+        rfcf_layout.addWidget(self.rfcf_entry, alignment=Qt.AlignRight)
+
+        self.sep2 = QLabel(" Or ")
+        self.sep2.setFont(self.font)
+
+        rwacc_layout = QHBoxLayout()
+        self.rev_wacc = QLabel("Obtained Compounded Return Rate for Selected Number of Years (%):     ")
+        self.rev_wacc.setFont(self.font)
+        self.rwacc_entry = QLineEdit()
+        self.rwacc_entry.setFont(self.font)
+        self.rwacc_entry.setReadOnly(True)
+        self.rev_wacc.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        rwacc_layout.addWidget(self.rev_wacc, alignment=Qt.AlignLeft)
+        rwacc_layout.addWidget(self.rwacc_entry, alignment=Qt.AlignRight)
+
+        rev_dcf_layout.addWidget(self.rev_dcf_start, alignment=Qt.AlignCenter)
+        rev_dcf_layout.addLayout(rrev_layout)
+        rev_dcf_layout.addWidget(self.sep1, alignment=Qt.AlignCenter)
+        rev_dcf_layout.addLayout(rfcf_layout)
+        rev_dcf_layout.addWidget(self.sep2, alignment=Qt.AlignCenter)
+        rev_dcf_layout.addLayout(rwacc_layout)
+
+        output_layout.addLayout(fv_layout, 0, 0)
+        output_layout.addLayout(cp_layout, 1, 0)
+        output_layout.addLayout(ud_layout, 2, 0)
+        output_layout.addLayout(rev_dcf_layout, 3, 0)
 
         self.output_frame.setLayout(output_layout)
 
@@ -224,15 +274,25 @@ class DCFApp(QMainWindow):
             self.cp_entry.clear()
             self.ud_entry.clear()
             self.info_text.clear()
+            self.rrev_entry.clear()
+            self.rfcf_entry.clear()
+            self.rwacc_entry.clear()
             current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, info_str = get_info(ticker)
             lines = info_str.splitlines()
             lines[-1] = lines[-1] + '\t'
-            [self.info_text.append(line) for line in lines]
+            for line in lines:
+                self.info_text.append(line)
+                self.info_text.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
             self.info_text.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
             results = dcf(rev_growth_rate, fcf_margin, nyears, starting_rev, wacc, tgr, total_shares, current_price)
-            self.fv_entry.setText("$"+str(results[0]))
+            fair_value, req_rg, req_wacc, req_fcf, curr_rev_growth = results
+            self.fv_entry.setText("$"+str(fair_value))
             self.cp_entry.setText("$"+str(current_price))
-            self.ud_entry.setText(str(calc_up_downside(results[0], current_price))+"%")
+            self.ud_entry.setText(str(calc_up_downside(fair_value, current_price))+"%")
+            self.rev_dcf_start.setText("\nTo Justify the Current Price of ${}".format(current_price))
+            self.rrev_entry.setText(str(req_rg))
+            self.rfcf_entry.setText(str(req_fcf))
+            self.rwacc_entry.setText(str(req_wacc))
         except Exception as e:
             self.fv_entry.setText(f"Error")
 
@@ -244,6 +304,9 @@ class DCFApp(QMainWindow):
         self.cp_entry.clear()
         self.ud_entry.clear()
         self.info_text.clear()
+        self.rrev_entry.clear()
+        self.rfcf_entry.clear()
+        self.rwacc_entry.clear()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
