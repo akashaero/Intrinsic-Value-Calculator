@@ -8,13 +8,18 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPus
 from PySide6.QtGui import QFont, QFontDatabase, QIcon, QHoverEvent
 from PySide6.QtCore import Qt, QSize, QEvent
 from src.provider import *
-import warnings
+import warnings, platform
 import qdarktheme
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+font_name = "Consolas"
+
 def get_push_button(text, funct, font_size):
 	button = QPushButton(text)
-	button.setFont(QFont("Fixedsys", font_size))
+	font = QFont(font_name, font_size)
+	font.setStyleHint(QFont.Monospace)
+	font.setPointSize(font_size)
+	button.setFont(font)
 	button.setStyleSheet("QPushButton { background-color: #333333; \
 		                  color: #ffffff; } \
 		                  QPushButton::pressed \
@@ -27,10 +32,13 @@ def get_push_button(text, funct, font_size):
 def get_text_entry_box(label, font_size, bold=False, readOnly=False):
 	layout = QHBoxLayout()
 	field_text = QLabel(label)
-	field_text.setFont(QFont("Fixedsys", font_size))
+	font = QFont(font_name, font_size)
+	font.setStyleHint(QFont.Monospace)
+	font.setPointSize(font_size)
+	field_text.setFont(font)
 	if bold: field_text.setStyleSheet("font-weight: bold")
 	field_entry = QLineEdit()
-	field_entry.setFont(QFont("Fixedsys", font_size))
+	field_entry.setFont(font)
 	if bold: field_entry.setStyleSheet("font-weight: bold")
 	if readOnly: field_entry.setReadOnly(True)
 	layout.addWidget(field_text, alignment=Qt.AlignRight)
@@ -49,7 +57,10 @@ def get_dark_mode_toggle_button(funct):
 def get_information_layout(font_size):
 	info_layout = QVBoxLayout()
 	info_text = QTextEdit()
-	info_text.setFont(QFont("Fixedsys", font_size))
+	font = QFont(font_name, font_size)
+	font.setStyleHint(QFont.Monospace)
+	font.setPointSize(font_size)
+	info_text.setFont(font)
 	info_text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 	info_text.setReadOnly(True)
 	info_layout.addWidget(info_text, alignment=Qt.AlignBottom)
@@ -65,7 +76,12 @@ def get_central_buttons(funct_reset, funct_calc, funct_populate, font_size):
 	layout.addWidget(populate_button)
 	return reset_button, calc_button, populate_button, layout
 
-def get_output_layout(font_size):
-	fv_label, fv_layout = get_text_entry_box("Fair Value:    ", int(1.5*font_size), bold=True, readOnly=True)
-	cp_label, cp_layout = get_text_entry_box("Current Price:    ", font_size, bold=True, readOnly=True)
-	ud_label, ud_layout = get_text_entry_box("Upside/Downside (%):    ", font_size, bold=True, readOnly=True)
+def get_label(text, font_size, bold=False):
+	label  = QLabel(text)
+	font = QFont(font_name, font_size)
+	font.setStyleHint(QFont.Monospace)
+	font.setPointSize(font_size)
+	label.setFont(font)
+	if bold: label.setStyleSheet("font-weight: bold")
+	label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+	return label

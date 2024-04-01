@@ -21,7 +21,10 @@ import yfinance as yf
 import pandas as pd
 from scipy.optimize import minimize_scalar
 from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QPlainTextEdit, QSizePolicy, QToolButton, QGridLayout, QTextEdit, QTableWidgetItem, QSlider
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit
+from PySide6.QtWidgets import QPushButton, QVBoxLayout, QHBoxLayout, QWidget
+from PySide6.QtWidgets import QPlainTextEdit, QSizePolicy, QToolButton
+from PySide6.QtWidgets import QGridLayout, QTextEdit, QTableWidgetItem, QSlider
 from PySide6.QtGui import QFont, QFontDatabase, QIcon, QHoverEvent
 from PySide6.QtCore import Qt, QSize, QEvent
 from src.provider import *
@@ -46,7 +49,6 @@ class DCFApp(QMainWindow):
 
         # Load font
         self.font_size = 12
-        self.font = QFont("Fixedsys", 12)
 
         # Create widgets
         self.input_frame = QWidget()
@@ -125,83 +127,23 @@ class DCFApp(QMainWindow):
     def create_output_frame(self):
         output_layout = QGridLayout()
         
-        # # Fair Value Output Box
-        # fv_layout = QHBoxLayout()
-        # fv_label = QLabel("Fair Value:    ")
-        # fv_label.setFont(QFont("Courier New", 18))
-        # fv_label.setStyleSheet("font-weight: bold")
-        # self.fv_entry = QLineEdit()
-        # self.fv_entry.setFont(QFont("Courier New", 18))
-        # self.fv_entry.setStyleSheet("font-weight: bold")
-        # self.fv_entry.setReadOnly(True)
-        # fv_layout.addWidget(fv_label, alignment=Qt.AlignRight)
-        # fv_layout.addWidget(self.fv_entry, alignment=Qt.AlignLeft)
-        self.fv_entry
+        # Main output boxes
+        self.fv_entry, fv_layout = get_text_entry_box("Fair Value:    ", int(1.5*self.font_size), bold=True, readOnly=True)
+        self.cp_entry, cp_layout = get_text_entry_box("Current Price:    ", self.font_size, bold=True, readOnly=True)
+        self.ud_entry, ud_layout = get_text_entry_box("Upside/Downside (%):    ", self.font_size, bold=True, readOnly=True)
 
-        # # Current Price Output Box
-        # cp_layout = QHBoxLayout()
-        # cp_label = QLabel("Current Price:    ")
-        # cp_label.setFont(self.font)
-        # self.cp_entry = QLineEdit()
-        # self.cp_entry.setFont(self.font)
-        # self.cp_entry.setReadOnly(True)
-        # cp_layout.addWidget(cp_label, alignment=Qt.AlignRight)
-        # cp_layout.addWidget(self.cp_entry, alignment=Qt.AlignLeft)
-        self.cp_entry
-        
-        # # Upside/Downside Output Box
-        # ud_layout = QHBoxLayout()
-        # ud_label = QLabel("Upside/Downside (%):    ")
-        # ud_label.setFont(self.font)
-        # self.ud_entry = QLineEdit()
-        # self.ud_entry.setFont(self.font)
-        # self.ud_entry.setReadOnly(True)
-        # ud_layout.addWidget(ud_label, alignment=Qt.AlignRight)
-        # ud_layout.addWidget(self.ud_entry, alignment=Qt.AlignLeft)
-        self.ud_entry
+        # Start of reverse DCF outputs
+        self.rev_dcf_start = get_label("\nTo Justify the Current Price", self.font_size, bold=True)
 
+        # Reverse DCF outputs
+        self.rrev_entry, rrev_layout = get_text_entry_box("Required Revenue Growth at Current FCF Margin (%):     ", self.font_size, readOnly=True)
+        self.sep1 = get_label(" Or ", self.font_size)
+        self.rfcf_entry, rfcf_layout = get_text_entry_box("Required Free Cash Flow Margin at Current Revenue Growth (%):     ", self.font_size, readOnly=True)
+        self.sep2 = get_label(" Or ", self.font_size)
+        self.rwacc_entry, rwacc_layout = get_text_entry_box("Obtained Compounded Return Rate for Selected Number of Years:     ", self.font_size, readOnly=True)
+
+        # Lay out the output frame
         rev_dcf_layout = QVBoxLayout()
-        self.rev_dcf_start = QLabel("\nTo Justify the Current Price")
-        self.rev_dcf_start.setFont(self.font)
-        self.rev_dcf_start.setStyleSheet("font-weight: bold")
-        self.rev_dcf_start.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        rrev_layout = QHBoxLayout()
-        self.rev_revenue = QLabel("Required Revenue Growth at Current FCF Margin (%):     ")
-        self.rev_revenue.setFont(self.font)
-        self.rrev_entry = QLineEdit()
-        self.rrev_entry.setFont(self.font)
-        self.rrev_entry.setReadOnly(True)
-        self.rev_revenue.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        rrev_layout.addWidget(self.rev_revenue, alignment=Qt.AlignLeft)
-        rrev_layout.addWidget(self.rrev_entry, alignment=Qt.AlignRight)
-
-        self.sep1 = QLabel(" Or ")
-        self.sep1.setFont(self.font)
-
-        rfcf_layout = QHBoxLayout()
-        self.rev_fcf = QLabel("Required Free Cash Flow Margin at Current Revenue Growth (%):     ")
-        self.rev_fcf.setFont(self.font)
-        self.rfcf_entry = QLineEdit()
-        self.rfcf_entry.setFont(self.font)
-        self.rfcf_entry.setReadOnly(True)
-        self.rev_fcf.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        rfcf_layout.addWidget(self.rev_fcf, alignment=Qt.AlignLeft)
-        rfcf_layout.addWidget(self.rfcf_entry, alignment=Qt.AlignRight)
-
-        self.sep2 = QLabel(" Or ")
-        self.sep2.setFont(self.font)
-
-        rwacc_layout = QHBoxLayout()
-        self.rev_wacc = QLabel("Obtained Compounded Return Rate for Selected Number of Years:     ")
-        self.rev_wacc.setFont(self.font)
-        self.rwacc_entry = QLineEdit()
-        self.rwacc_entry.setFont(self.font)
-        self.rwacc_entry.setReadOnly(True)
-        self.rev_wacc.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        rwacc_layout.addWidget(self.rev_wacc, alignment=Qt.AlignLeft)
-        rwacc_layout.addWidget(self.rwacc_entry, alignment=Qt.AlignRight)
-
         rev_dcf_layout.addWidget(self.rev_dcf_start, alignment=Qt.AlignCenter)
         rev_dcf_layout.addLayout(rrev_layout)
         rev_dcf_layout.addWidget(self.sep1, alignment=Qt.AlignCenter)
@@ -214,6 +156,7 @@ class DCFApp(QMainWindow):
         output_layout.addLayout(ud_layout, 2, 0)
         output_layout.addLayout(rev_dcf_layout, 3, 0)
 
+        # Finalize output frame
         self.output_frame.setLayout(output_layout)
 
     def valuechange(self):
@@ -228,7 +171,7 @@ class DCFApp(QMainWindow):
         self.info_text.clear()
         _, _, _, _, _, info_str = get_info(self.ticker_entry.text().upper())
         lines = info_str.splitlines()
-        lines[-1] = lines[-1] + '\t'
+        lines[-1] = lines[-1] + '     '
         for i, line in enumerate(lines):
             self.info_text.append(line)
             self.info_text.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
@@ -251,7 +194,7 @@ class DCFApp(QMainWindow):
             self.rwacc_entry.clear()
             current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, info_str = get_info(ticker)
             lines = info_str.splitlines()
-            lines[-1] = lines[-1] + '\t'
+            lines[-1] = lines[-1] + '     '
             for line in lines:
                 self.info_text.append(line)
                 self.info_text.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
