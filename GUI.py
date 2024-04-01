@@ -24,7 +24,8 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QPlainTextEdit, QSizePolicy, QToolButton, QGridLayout, QTextEdit, QTableWidgetItem, QSlider
 from PySide6.QtGui import QFont, QFontDatabase, QIcon, QHoverEvent
 from PySide6.QtCore import Qt, QSize, QEvent
-from provider import *
+from src.provider import *
+from src.gui_elements import *
 import warnings
 import qdarktheme
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -35,7 +36,7 @@ class DCFApp(QMainWindow):
         self.setWindowTitle("Intrinsic Value Calculator")
         self.setMinimumSize(700, 800)
 
-        # Match the current OS theme
+        # Activate dark mode by default
         qdarktheme.setup_theme("dark")
 
         # Set icon
@@ -44,136 +45,73 @@ class DCFApp(QMainWindow):
         self.setWindowIcon(my_icon)
 
         # Load font
-        self.font = QFont("Courier", 12)
+        self.font_size = 12
+        self.font = QFont("Fixedsys", 12)
 
         # Create widgets
         self.input_frame = QWidget()
         self.output_frame = QWidget()
 
+        # Create frames
         self.create_input_frame()
         self.create_output_frame()
 
+        # Add frames to main layout
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.input_frame)
         main_layout.addWidget(self.output_frame)
 
+        # Form the final GUI
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
     def create_input_frame(self):
-        theme_layout = QGridLayout()
-        final_layout = QVBoxLayout()
-        prefinal_layout = QVBoxLayout() 
-        upper_layout = QGridLayout()
-
-        self.toggle_button = QPushButton("Turn Dark Mode OFF")
-        self.toggle_button.setFont(QFont("Courier New", 10))
-        self.toggle_button.setStyleSheet("background-color: #333333; color: #ffffff; padding: 6px; border-radius: 10px;")
-        self.toggle_button.setIconSize(QSize(24, 24))
-        self.toggle_button.clicked.connect(self.valuechange)
-        theme_layout.addWidget(self.toggle_button, 0, 0)
-        theme_layout.addWidget(QLabel("\t"), 0, 1)
-        theme_layout.addWidget(QLabel("\t"), 0, 2)
-        theme_layout.addWidget(QLabel("\t"), 0, 3)
+        # Toggle Button for Dark Mode
+        self.toggle_button, theme_layout = get_dark_mode_toggle_button(self.valuechange)
                 
         # Ticker input
-        ticker_layout = QHBoxLayout()
-        ticker_label = QLabel("Ticker:    ")
-        ticker_label.setFont(self.font)
-        self.ticker_entry = QLineEdit()
-        self.ticker_entry.setFont(self.font)
-        ticker_layout.addWidget(ticker_label, alignment=Qt.AlignRight)
-        ticker_layout.addWidget(self.ticker_entry, alignment=Qt.AlignLeft)
+        self.ticker_entry, ticker_layout = get_text_entry_box("Ticker:     ", self.font_size)
 
         # Revenue growth rate input
-        rev_growth_layout = QHBoxLayout()
-        rev_growth_label = QLabel("Revenue Growth Rate (%):    ")
-        rev_growth_label.setFont(self.font)
-        self.rev_growth_entry = QLineEdit()
-        self.rev_growth_entry.setFont(self.font)
-        rev_growth_layout.addWidget(rev_growth_label, alignment=Qt.AlignRight)
-        rev_growth_layout.addWidget(self.rev_growth_entry, alignment=Qt.AlignLeft)
+        self.rev_growth_entry, rev_growth_layout = get_text_entry_box("Revenue Growth Rate (%):    ", self.font_size)
 
         # FCF margin input
-        fcf_margin_layout = QHBoxLayout()
-        fcf_margin_label = QLabel("Free Cash Flow (FCF) Margin (%):    ")
-        fcf_margin_label.setFont(self.font)
-        self.fcf_margin_entry = QLineEdit()
-        self.fcf_margin_entry.setFont(self.font)
-        fcf_margin_layout.addWidget(fcf_margin_label, alignment=Qt.AlignRight)
-        fcf_margin_layout.addWidget(self.fcf_margin_entry, alignment=Qt.AlignLeft)
+        self.fcf_margin_entry, fcf_margin_layout = get_text_entry_box("Free Cash Flow (FCF) Margin (%):    ", self.font_size)
 
-        # Number of years input
-        nyears_layout = QHBoxLayout()
-        nyears_label = QLabel("Number of Years:    ")
-        nyears_label.setFont(self.font)
-        self.nyears_entry = QLineEdit()
-        self.nyears_entry.setFont(self.font)
+        # Number of years input with default value
+        self.nyears_entry, nyears_layout = get_text_entry_box("Number of Years:    ", self.font_size)
         self.nyears_entry.setText("7")
-        nyears_layout.addWidget(nyears_label, alignment=Qt.AlignRight)
-        nyears_layout.addWidget(self.nyears_entry, alignment=Qt.AlignLeft)
 
         # WACC input
-        wacc_layout = QHBoxLayout()
-        wacc_label = QLabel("Discount Rate / WACC (%):    ")
-        wacc_label.setFont(self.font)
-        self.wacc_entry = QLineEdit()
-        self.wacc_entry.setFont(self.font)
+        self.wacc_entry, wacc_layout = get_text_entry_box("Discount Rate / WACC (%):    ", self.font_size)
         self.wacc_entry.setText("10")
-        wacc_layout.addWidget(wacc_label, alignment=Qt.AlignRight)
-        wacc_layout.addWidget(self.wacc_entry, alignment=Qt.AlignLeft)
 
         # Terminal growth rate input
-        tgr_layout = QHBoxLayout()
-        tgr_label = QLabel("Terminal Growth Rate (%):    ")
-        tgr_label.setFont(self.font)
-        self.tgr_entry = QLineEdit()
-        self.tgr_entry.setFont(self.font)
+        self.tgr_entry, tgr_layout = get_text_entry_box("Terminal Growth Rate (%):    ", self.font_size)
         self.tgr_entry.setText("2.5")
-        tgr_layout.addWidget(tgr_label, alignment=Qt.AlignRight)
-        tgr_layout.addWidget(self.tgr_entry, alignment=Qt.AlignLeft)
 
         # Information Layout
-        info_layout = QVBoxLayout()
-        self.info_text = QTextEdit()
-        self.info_text.setFont(self.font)
-        self.info_text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.info_text.setReadOnly(True)
-        info_layout.addWidget(self.info_text, alignment=Qt.AlignBottom)
+        self.info_text, info_layout = get_information_layout(self.font_size)
 
-        # Buttons
-        button_layout = QHBoxLayout()
+        # Buttons (Reset, Calculate, and Populate Info)
+        self.reset_button, self.calculate_button, self.populate_button, button_layout = get_central_buttons(self.reset_fields, \
+                                                                                                            self.calculate_dcf, \
+                                                                                                            self.populate_info, \
+                                                                                                            self.font_size)
 
-        self.calculate_button = QPushButton("Calculate Fair Value")
-        self.calculate_button.setFont(self.font)
-        self.calculate_button.setStyleSheet("QPushButton { background-color: #333333; color: #ffffff; } QPushButton::pressed { background-color: light-blue }; padding: 8px; border-radius: 10px;")
-        self.calculate_button.setIconSize(QSize(24, 24))
-        self.calculate_button.clicked.connect(self.calculate_dcf)
-        
-        self.reset_button = QPushButton("Reset")
-        self.reset_button.setFont(self.font)
-        self.reset_button.setStyleSheet("QPushButton { background-color: #333333; color: #ffffff; } QPushButton::pressed { background-color: light-blue }; padding: 8px; border-radius: 10px;")
-        self.reset_button.setIconSize(QSize(24, 24))
-        self.reset_button.clicked.connect(self.reset_fields)
-
-        self.populate_button = QPushButton("Populate Info")
-        self.populate_button.setFont(self.font)
-        self.populate_button.setStyleSheet("QPushButton { background-color: #333333; color: #ffffff; } QPushButton::pressed { background-color: light-blue }; padding: 8px; border-radius: 10px;")
-        self.populate_button.setIconSize(QSize(24, 24))
-        self.populate_button.clicked.connect(self.populate_info)
-
-        button_layout.addWidget(self.reset_button)
-        button_layout.addWidget(self.calculate_button)
-        button_layout.addWidget(self.populate_button)
+        # Layout Framework
+        final_layout    = QVBoxLayout()
+        prefinal_layout = QVBoxLayout()
+        upper_layout    = QGridLayout()
 
         # Start Arranging Layouts in Input Frame
-        upper_layout.addLayout(ticker_layout, 0, 0)
+        upper_layout.addLayout(ticker_layout,     0, 0)
         upper_layout.addLayout(rev_growth_layout, 1, 0)
         upper_layout.addLayout(fcf_margin_layout, 2, 0)
-        upper_layout.addLayout(nyears_layout, 3, 0)
-        upper_layout.addLayout(wacc_layout, 4, 0)
-        upper_layout.addLayout(tgr_layout, 5, 0)
+        upper_layout.addLayout(nyears_layout,     3, 0)
+        upper_layout.addLayout(wacc_layout,       4, 0)
+        upper_layout.addLayout(tgr_layout,        5, 0)
 
         prefinal_layout.addLayout(theme_layout)
         prefinal_layout.addLayout(upper_layout)
@@ -187,37 +125,40 @@ class DCFApp(QMainWindow):
     def create_output_frame(self):
         output_layout = QGridLayout()
         
-        # Fair Value Output Box
-        fv_layout = QHBoxLayout()
-        fv_label = QLabel("Fair Value:    ")
-        fv_label.setFont(QFont("Courier New", 18))
-        fv_label.setStyleSheet("font-weight: bold")
-        self.fv_entry = QLineEdit()
-        self.fv_entry.setFont(QFont("Courier New", 18))
-        self.fv_entry.setStyleSheet("font-weight: bold")
-        self.fv_entry.setReadOnly(True)
-        fv_layout.addWidget(fv_label, alignment=Qt.AlignRight)
-        fv_layout.addWidget(self.fv_entry, alignment=Qt.AlignLeft)
+        # # Fair Value Output Box
+        # fv_layout = QHBoxLayout()
+        # fv_label = QLabel("Fair Value:    ")
+        # fv_label.setFont(QFont("Courier New", 18))
+        # fv_label.setStyleSheet("font-weight: bold")
+        # self.fv_entry = QLineEdit()
+        # self.fv_entry.setFont(QFont("Courier New", 18))
+        # self.fv_entry.setStyleSheet("font-weight: bold")
+        # self.fv_entry.setReadOnly(True)
+        # fv_layout.addWidget(fv_label, alignment=Qt.AlignRight)
+        # fv_layout.addWidget(self.fv_entry, alignment=Qt.AlignLeft)
+        self.fv_entry
 
-        # Current Price Output Box
-        cp_layout = QHBoxLayout()
-        cp_label = QLabel("Current Price:    ")
-        cp_label.setFont(self.font)
-        self.cp_entry = QLineEdit()
-        self.cp_entry.setFont(self.font)
-        self.cp_entry.setReadOnly(True)
-        cp_layout.addWidget(cp_label, alignment=Qt.AlignRight)
-        cp_layout.addWidget(self.cp_entry, alignment=Qt.AlignLeft)
+        # # Current Price Output Box
+        # cp_layout = QHBoxLayout()
+        # cp_label = QLabel("Current Price:    ")
+        # cp_label.setFont(self.font)
+        # self.cp_entry = QLineEdit()
+        # self.cp_entry.setFont(self.font)
+        # self.cp_entry.setReadOnly(True)
+        # cp_layout.addWidget(cp_label, alignment=Qt.AlignRight)
+        # cp_layout.addWidget(self.cp_entry, alignment=Qt.AlignLeft)
+        self.cp_entry
         
-        # Upside/Downside Output Box
-        ud_layout = QHBoxLayout()
-        ud_label = QLabel("Upside/Downside (%):    ")
-        ud_label.setFont(self.font)
-        self.ud_entry = QLineEdit()
-        self.ud_entry.setFont(self.font)
-        self.ud_entry.setReadOnly(True)
-        ud_layout.addWidget(ud_label, alignment=Qt.AlignRight)
-        ud_layout.addWidget(self.ud_entry, alignment=Qt.AlignLeft)
+        # # Upside/Downside Output Box
+        # ud_layout = QHBoxLayout()
+        # ud_label = QLabel("Upside/Downside (%):    ")
+        # ud_label.setFont(self.font)
+        # self.ud_entry = QLineEdit()
+        # self.ud_entry.setFont(self.font)
+        # self.ud_entry.setReadOnly(True)
+        # ud_layout.addWidget(ud_label, alignment=Qt.AlignRight)
+        # ud_layout.addWidget(self.ud_entry, alignment=Qt.AlignLeft)
+        self.ud_entry
 
         rev_dcf_layout = QVBoxLayout()
         self.rev_dcf_start = QLabel("\nTo Justify the Current Price")
