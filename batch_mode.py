@@ -38,14 +38,15 @@ Stock_Ticker  , Rev_Growth_Estimate, FCF_Margin_Estimate
 
 '''
 
-import subprocess
 import numpy as np
 import yfinance as yf
 import argparse
-import os, csv
+import csv, time
 import pandas as pd
 from tabulate import tabulate
-from provider import *
+from src.provider import *
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Calculate Intrinsic Value of Businesses Using Batch Mode!')
@@ -99,7 +100,9 @@ if __name__ == '__main__':
     for t in data.index:
       tmp_list = []
       tmp_list.append(t)
-      current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin = get_info(t)
+      current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, data = get_info(t)
+      print(data, '\n')
+      time.sleep(2.5) # Allow 2 requests per 5 second interval
       results = dcf(data.loc[t]['Rev_Growth_Estimate (%)']/100., data.loc[t]['FCF_Margin_Estimate (%)']/100., args.N, starting_rev, args.rrr/100., args.tgr/100., total_shares, current_price)
       fv, r_rg, r_wacc, r_fcf, rev_growth = results
       tmp_list.append('$'+str(round(fv, 2)))

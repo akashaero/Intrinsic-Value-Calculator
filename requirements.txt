@@ -3,3 +3,5 @@ numpy
 tabulate
 yfinance
 pandas
+PySide6
+pyqtdarktheme

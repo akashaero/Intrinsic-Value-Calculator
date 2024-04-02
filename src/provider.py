@@ -84,9 +84,7 @@ def get_info(ticker):
   table_data.append(make_list('Dilution(+)/Buybacks(-)', buybacks))
   table_data.append(make_list('FCF Margins', fcf_margins))
   table_data.append(['Analyst Expected Growth (5Y)', analyst_growth, '-', '-'])
-  print(tabulate(table_data, headers=header))
-  time.sleep(2.5) # Limit 2 requests per 5 seconds
-  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin
+  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, tabulate(table_data, headers=header)
 
 def dcf(rev_growth_array, fcf_margins_array, n_future_years, latest_revenue, \
         wacc, tgr, total_shares, current_price, reverse_dcf_mode=False):
@@ -199,6 +197,33 @@ def print_calculated_info(results, current_price, fcf_margins, prev_rev_growth, 
         .format(r_fcf))
   print('  or     you get {}% annualized return for next {} years compared to assumed {}% '\
         .format(r_wacc, n_future_years, wacc))
+
+def get_calculated_info(results, current_price, fcf_margins, prev_rev_growth, \
+                          prev_fcf_margin, tkr, tgr, wacc, n_future_years):
+  fv, r_rg, r_wacc, r_fcf, rev_growth = results
+  if np.array([fcf_margins]).shape == (1,):
+    pass
+  else:
+    fcf_margins = np.average(np.array(fcf_margins))
+
+  out_str = ''
+  out_str += ('Based on your inputs, for next {} years,'.format(n_future_years))
+  out_str += ('Assuming {}% of average annual revenue growth,'.format(rev_growth))
+  out_str += ('         {}% of free cash flow margin, and'.format(fcf_margins))
+  out_str += ('         {}% of terminal growth rate,\n'.format(tgr))
+  out_str += ('The fair value for {} stock is ${} to get {}% of annualized return for next {} years.'\
+        .format(tkr, fv, wacc, n_future_years))
+  out_str += ('\nBased on previous close price of ${}, the upside/downside is {}%'\
+       .format(current_price, calc_up_downside(fv, current_price)))
+  out_str += ('\nTo justify the current stock price of ${}, Either,'\
+        .format(current_price))
+  out_str += ('{} would have to grow at {}% average annual rate for next {} years'\
+        .format(tkr, r_rg, n_future_years))
+  out_str += ('  or     have free cash flow margin of {}%'\
+        .format(r_fcf))
+  out_str += ('  or     you get {}% annualized return for next {} years compared to assumed {}% '\
+        .format(r_wacc, n_future_years, wacc))
+  return out_str
 
 def calc_cagr(rev_growth_array, N):
   if np.array([rev_growth_array]).shape == (1,):
