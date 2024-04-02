@@ -25,7 +25,7 @@ Some quick notes. DCF models do not value bank stocks well. For banks, multiples
 
 ## Table of Contents
 
-- [Graphical User Interface (#GUI)]
+- [Graphical User Interface](#gui)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Arguments](#arguments)
@@ -37,7 +37,7 @@ Some quick notes. DCF models do not value bank stocks well. For banks, multiples
 ## Graphical User Interface
 Introducing the new graphical user interface (GUI) for Intrinsic Value Calculator tool that is cross-plateform and is distributed as an executable for users who want to get straight to the company fair value calculations! Please find that executable package here. Alternatively, users who want run the program and GUI using terminal can follow the next steps in the readme file. Here's what the GUI looks like (yes, there is a dark mode!).
 
-![dm](logo/GUI_DM.png, "GUI in Dark Mode") ![lm](logo/GUI_LM.png, "GUI in Light Mode")
+![dm](logo/GUI_DM.png "GUI in Dark Mode") ![lm](logo/GUI_LM.png "GUI in Light Mode")
 
 Using it is very straight forward. All it asks from the users is the ticker, revenue growth assumption, and free cash flow margin assumption. User can also change number of years [to forecast in future for calculation of the fair value], discount rate [also knowns as weighted average cost of capital], and terminal growth rate [the growth rate when company becomes mature] fields. Default values of which are provided just as a starting point.
 
