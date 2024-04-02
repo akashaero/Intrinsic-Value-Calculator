@@ -44,7 +44,7 @@ class DCFApp(QMainWindow):
 
         # Set icon
         my_icon = QIcon()
-        my_icon.addFile('logo/llama_stocks.jpeg')
+        my_icon.addFile('logo/icon.ico')
         self.setWindowIcon(my_icon)
 
         # Load font
