@@ -25,6 +25,7 @@ Some quick notes. DCF models do not value bank stocks well. For banks, multiples
 
 ## Table of Contents
 
+- [Graphical User Interface (#GUI)]
 - [Installation](#installation)
 - [Usage](#usage)
 - [Arguments](#arguments)
@@ -32,6 +33,17 @@ Some quick notes. DCF models do not value bank stocks well. For banks, multiples
 - [Upcoming Features](#upcomingfeatures)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Graphical User Interface
+Introducing the new graphical user interface (GUI) for Intrinsic Value Calculator tool that is cross-plateform and is distributed as an executable for users who want to get straight to the company fair value calculations! Please find that executable package here. Alternatively, users who want run the program and GUI using terminal can follow the next steps in the readme file. Here's what the GUI looks like (yes, there is a dark mode!).
+
+![dm](logo/GUI_DM.png, "GUI in Dark Mode") ![lm](logo/GUI_LM.png, "GUI in Light Mode")
+
+Using it is very straight forward. All it asks from the users is the ticker, revenue growth assumption, and free cash flow margin assumption. User can also change number of years [to forecast in future for calculation of the fair value], discount rate [also knowns as weighted average cost of capital], and terminal growth rate [the growth rate when company becomes mature] fields. Default values of which are provided just as a starting point.
+
+**Populate Info** button populates the last 3 years of revenue growth, share buybacks, fcf margins, and analyst forecasted growth rates fot user's knowlege. So if you just input the ticker symbol and press populate info, you can look at all that data about the company before making an educated guess about rest of the input fields. Once you are ready, press the **Calculate Fair Value** button to get the Fair Value per Share as well as precentage upside/downside based on current price for the selected company based on your assumptions. Also look at the other fields that try to justify the current price of the stock using some what-if analysis.
+
+Feedback is very much appreciated. Please open up an issue with the feedback/problem and I will respond to you as soon as I can.
 
 ## Installation
 
@@ -42,7 +54,7 @@ git clone https://github.com/akashaero/Intrinsic-Value-Calculator.git
 cd Intrinsic-Value-Calculator
 ```
 
-2. (Optional) Set up a virtual environment or conda environment to isolate the dependencies:
+2. (Optional but Highly Recommended) Set up a virtual environment or conda environment to isolate the dependencies:
 
 ```
 python -m venv stonks           # Create Virtual Environment
@@ -138,7 +150,6 @@ python batch_mode.py --gen_file example.txt
 python batch_mode.py example.csv
 ```
 ## Upcoming Features
-* A simple graphical user interface is in the works for this application and will be released soon here!
 * A theoretical guide for discounted cash flow model will be posted in the form of a blog post.
 * More financial models are being worked on including the "Dividend Discount Model", and "EPS based Fair Value Model"
 
@@ -148,6 +159,6 @@ If you'd like to contribute, please open up a pull request and if it is addressi
 
 ## License
 
-Apache 2.0 License
+GNU LGPLv2.1 License
 
-Apache 2.0 License © [Akash Patel](https://github.com/akashaero)
+GNU LGPLv2.1 License © [Akash Patel](https://github.com/akashaero)
