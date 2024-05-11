@@ -135,6 +135,10 @@ class DCFApp(QMainWindow):
         # Start of reverse DCF outputs
         self.rev_dcf_start = get_label("\nTo Justify the Current Price", self.font_size, bold=True)
 
+        # Credit Label
+        self.credit_label = get_label('\nMade by Akash Patel | '+'''<a href='https://github.com/akashaero'>Github -> @akashaero</a>''', 14, bold=False)
+        self.credit_label.setOpenExternalLinks(True)
+
         # Reverse DCF outputs
         self.rrev_entry, rrev_layout = get_text_entry_box("Required Revenue Growth at Current FCF Margin (%):     ", self.font_size, readOnly=True)
         self.sep1 = get_label(" Or ", self.font_size)
@@ -150,6 +154,7 @@ class DCFApp(QMainWindow):
         rev_dcf_layout.addLayout(rfcf_layout)
         rev_dcf_layout.addWidget(self.sep2, alignment=Qt.AlignCenter)
         rev_dcf_layout.addLayout(rwacc_layout)
+        rev_dcf_layout.addWidget(self.credit_label, alignment=Qt.AlignCenter)
 
         output_layout.addLayout(fv_layout, 0, 0)
         output_layout.addLayout(cp_layout, 1, 0)
