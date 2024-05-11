@@ -8,7 +8,7 @@ As Warren Buffett has famously said,
 
 The same principle applies when you are valuing a business (stock of a business). If a business promises to generate a certain amount of dollars in cumulative cash flow in the future, you would want to discount that cash flow in today's dollars assuming you want to get a certain percentage of annualized return rate. You definitely would not want to pay for future cash flow as the face value (because that ensures a solid 0% return given your assumptions about the company are correct). Now, assuming that the company you are evaluating will still be in the business after your analysis period, you'd calculate the terminal value of a business by using the terminal growth rate and add that to your fair value calculations as well. This tool assumes a terminal growth rate of 2.5% with the user option to change it with each analysis. The terminal growth rate suggests that when the company reaches maturity, it will likely grow at the long-term growth rate of the economy.
 
-Currently, this tool runs a **Discounted Cash Flow (DCF)** analysis to calculate the fair value of a stock. In the future, more models will be added such as "Earnings Per Share Based Model", and "Dividend Discount Model (DDM)". 
+Currently, this tool runs a **Discounted Cash Flow (DCF)** analysis to calculate the fair value of a stock. In the future, more models will be added such as "Earnings Per Share Based Model", and "Dividend Discount Model (DDM)". Theory behind the DCF model is explained ([here](https://github.com/akashaero/Intrinsic-Value-Calculator/wiki/Discounted-Cash-Flow-(DCF)-Modeling-101!))
 
 No model or technique is perfect and nothing is going to give you an exact price at which a business should be bought. What this model helps with is getting you closer to the true value of a business while taking your assumptions about the business at face value. This should not be relied on as the only data point you look at before making your financial decisions.
 
@@ -150,7 +150,6 @@ python batch_mode.py --gen_file example.txt
 python batch_mode.py example.csv
 ```
 ## Upcoming Features
-* A theoretical guide for discounted cash flow model will be posted in the form of a blog post.
 * More financial models are being worked on including the "Dividend Discount Model", and "EPS based Fair Value Model"
 
 ## Contributing
