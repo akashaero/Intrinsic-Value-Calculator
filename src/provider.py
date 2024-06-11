@@ -43,6 +43,8 @@ def get_info(ticker):
       return results
 
   def make_list(label, ar):
+    if len(ar) > 3:
+      ar = ar[1:]
     tmp_list = [label, '-', '-', '-']
     if len(ar) == 2:
       start_idx = 2
@@ -54,6 +56,8 @@ def get_info(ticker):
       if ar[0] != '-':
         tmp_list[start_idx] = str(round(100*ar[i], 2))+'%'
       start_idx += 1
+      if start_idx >= len(tmp_list):
+        break;
     return tmp_list[0:4]
 
   starting_fcf    = float(cashflow.loc['Free Cash Flow'][0]) if not np.isnan(cashflow.loc['Free Cash Flow'][0]) else '-'
