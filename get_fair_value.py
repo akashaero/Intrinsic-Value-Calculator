@@ -33,8 +33,6 @@ or
 $ python get_fair_value.py INTC 12.2 20 --N 7 --rrr 10 --tgr 2.5 -S
 '''
 
-import numpy as np
-import yfinance as yf
 from scipy.optimize import minimize_scalar
 import argparse
 from src.provider import *

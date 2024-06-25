@@ -8,7 +8,6 @@ Provides important utilities to main programs for stock valuation
 import numpy as np
 import yfinance as yf
 import os, csv, time
-import pandas as pd
 from tabulate import tabulate
 from scipy.optimize import minimize_scalar
 
@@ -72,6 +71,25 @@ def get_info(ticker):
   fcf_margins     = get_margins(income.loc['Total Revenue'], cashflow.loc['Free Cash Flow'])
   prev_rev_growth = rev_growth[-1]
   prev_fcf_margin = fcf_margins[-1]
+
+  business_summary = stock_info['longBusinessSummary'] if not np.isnan(stock_info['longBusinessSummary']) else '-'
+  fwdPE            = stock_info['forwardPE'] if not np.isnan(stock_info['forwardPE']) else '-'
+  avgVol           = stock_info['averageVolume'] if not np.isnan(stock_info['averageVolume']) else '-'
+  mcap             = stock_info['marketCap'] if not np.isnan(stock_info['marketCap']) else '-'
+  ttm_PS           = stock_info['priceToSalesTrailing12Months'] if not np.isnan(stock_info['priceToSalesTrailing12Months']) else '-'
+  currency         = stock_info['currency'] if not np.isnan(stock_info['currency']) else '-'
+  floatShares      = stock_info['floatShares'] if not np.isnan(stock_info['floatShares']) else '-'
+  totalShares      = stock_info['sharesOutstanding'] if not np.isnan(stock_info['sharesOutstanding']) else '-'
+  percent_short    = stock_info['shortPercentOfFloat'] if not np.isnan(stock_info['shortPercentOfFloat']) else '-'
+  book_val         = stock_info['bookValue'] if not np.isnan(stock_info['bookValue']) else '-'
+  pb               = stock_info['priceToBook'] if not np.isnan(stock_info['priceToBook']) else '-'
+  PEG              = stock_info['pegRatio'] if not np.isnan(stock_info['pegRatio']) else '-'
+  name1            = stock_info['shortName'] if not np.isnan(stock_info['shortName']) else '-'
+  name2            = stock_info['longName'] if not np.isnan(stock_info['longName']) else '-'
+  total_debt       = stock_info['totalDebt'] if not np.isnan(stock_info['totalDebt']) else '-'
+  ROA              = stock_info['returnOnAssets'] if not np.isnan(stock_info['returnOnAssets']) else '-'
+  ROE              = stock_info['returnOnEquity'] if not np.isnan(stock_info['returnOnEquity']) else '-'
+
   if 'forwardPE' in stock_info and 'pegRatio' in stock_info:
     if np.isnan(stock_info['forwardPE']) or np.isnan(stock_info['pegRatio']):
       analyst_growth = '-'

@@ -16,17 +16,13 @@ price.
 '''
 
 import sys
-import numpy as np
-import yfinance as yf
-import pandas as pd
 from scipy.optimize import minimize_scalar
-from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit
-from PySide6.QtWidgets import QPushButton, QVBoxLayout, QHBoxLayout, QWidget
-from PySide6.QtWidgets import QPlainTextEdit, QSizePolicy, QToolButton
-from PySide6.QtWidgets import QGridLayout, QTextEdit, QTableWidgetItem, QSlider
-from PySide6.QtGui import QFont, QFontDatabase, QIcon, QHoverEvent
-from PySide6.QtCore import Qt, QSize, QEvent
+from PySide6 import QtCore
+from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QVBoxLayout, QWidget
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt
 from src.provider import *
 from src.gui_elements import *
 import warnings

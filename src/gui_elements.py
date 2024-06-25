@@ -1,15 +1,9 @@
-import sys
-import numpy as np
-import yfinance as yf
-import pandas as pd
 from scipy.optimize import minimize_scalar
-from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QPlainTextEdit, QSizePolicy, QToolButton, QGridLayout, QTextEdit, QTableWidgetItem, QSlider
-from PySide6.QtGui import QFont, QFontDatabase, QIcon, QHoverEvent
-from PySide6.QtCore import Qt, QSize, QEvent
+from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QPlainTextEdit, QSizePolicy, QToolButton, QGridLayout, QTextEdit, QTableWidgetItem, QSlider
+from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt, QSize
 from src.provider import *
-import warnings, platform
-import qdarktheme
+import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 font_name = "Consolas"
