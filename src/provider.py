@@ -92,12 +92,14 @@ def get_info(ticker):
   
   percent_short = str(np.round(stock_info['shortPercentOfFloat']*100., 2))+'%' if not np.isnan(stock_info['shortPercentOfFloat']) else '-'
 
-  # Covert all these to Millions or Billions if not in thousands or tens
+  # Covert all these to Thousands, Millions or Billions if not in tens
   avgVol           = get_out_str(float(stock_info['averageVolume'])) if not np.isnan(stock_info['averageVolume']) else '-'
   mcap             = get_out_str(float(stock_info['marketCap'])) if not np.isnan(stock_info['marketCap']) else '-'
 
-  print(avgVol, mcap, percent_short, percFloat, business_name, fwdPE, currency, PEG)
-
+  # --------------------------
+  # Need to get percFloat, total_shares, latest_revenue, currency, business_name, and avgVol, mcap, and percent_short across to GUI.
+  # --------------------------
+  
   # # [Maybe in future]
   # business_summary = stock_info['longBusinessSummary'] if not np.isnan(stock_info['longBusinessSummary']) else '-'
   # book_val         = stock_info['bookValue'] if not np.isnan(stock_info['bookValue']) else '-'
