@@ -11,6 +11,14 @@ import os, csv, time
 from tabulate import tabulate
 from scipy.optimize import minimize_scalar
 
+def get_out_str(num):
+  if num is np.isnan(num): return num
+  elif num > 1000.0 and num < 1000000.0: return str(np.round(num/1000.0, 2))+'K'
+  elif num > 1000000.0 and num < 1000000000.0: return str(np.round(num/1000000.0, 2))+'M'
+  elif num > 1000000000.0 and num < 1000000000000.0: return str(np.round(num/1000000000.0, 2))+'B'
+  elif num > 1000000000000.0: return str(np.round(num/1000000000000.0, 2))+'T'
+  return num
+
 def get_info(ticker):
   stock      = yf.Ticker(ticker)
   income     = stock.income_stmt
@@ -72,31 +80,40 @@ def get_info(ticker):
   prev_rev_growth = rev_growth[-1]
   prev_fcf_margin = fcf_margins[-1]
 
-  business_summary = stock_info['longBusinessSummary'] if not np.isnan(stock_info['longBusinessSummary']) else '-'
-  fwdPE            = stock_info['forwardPE'] if not np.isnan(stock_info['forwardPE']) else '-'
-  avgVol           = stock_info['averageVolume'] if not np.isnan(stock_info['averageVolume']) else '-'
-  mcap             = stock_info['marketCap'] if not np.isnan(stock_info['marketCap']) else '-'
-  ttm_PS           = stock_info['priceToSalesTrailing12Months'] if not np.isnan(stock_info['priceToSalesTrailing12Months']) else '-'
-  currency         = stock_info['currency'] if not np.isnan(stock_info['currency']) else '-'
+  business_name   = stock_info['shortName']
+  fwdPE           = np.round(stock_info['forwardPE'], 2) if not np.isnan(stock_info['forwardPE']) else '-'
+  currency        = stock_info['currency']
+  PEG             = stock_info['pegRatio'] if not np.isnan(stock_info['pegRatio']) else '-'
+
+  # float % of total shares outstanding
   floatShares      = stock_info['floatShares'] if not np.isnan(stock_info['floatShares']) else '-'
-  totalShares      = stock_info['sharesOutstanding'] if not np.isnan(stock_info['sharesOutstanding']) else '-'
-  percent_short    = stock_info['shortPercentOfFloat'] if not np.isnan(stock_info['shortPercentOfFloat']) else '-'
-  book_val         = stock_info['bookValue'] if not np.isnan(stock_info['bookValue']) else '-'
-  pb               = stock_info['priceToBook'] if not np.isnan(stock_info['priceToBook']) else '-'
-  PEG              = stock_info['pegRatio'] if not np.isnan(stock_info['pegRatio']) else '-'
-  name1            = stock_info['shortName'] if not np.isnan(stock_info['shortName']) else '-'
-  name2            = stock_info['longName'] if not np.isnan(stock_info['longName']) else '-'
-  total_debt       = stock_info['totalDebt'] if not np.isnan(stock_info['totalDebt']) else '-'
-  ROA              = stock_info['returnOnAssets'] if not np.isnan(stock_info['returnOnAssets']) else '-'
-  ROE              = stock_info['returnOnEquity'] if not np.isnan(stock_info['returnOnEquity']) else '-'
+  if total_shares != '-' and floatShares != '-':
+    percFloat = str(np.round(100.*(floatShares / total_shares), 2))+'%'
+  
+  percent_short = str(np.round(stock_info['shortPercentOfFloat']*100., 2))+'%' if not np.isnan(stock_info['shortPercentOfFloat']) else '-'
+
+  # Covert all these to Millions or Billions if not in thousands or tens
+  avgVol           = get_out_str(float(stock_info['averageVolume'])) if not np.isnan(stock_info['averageVolume']) else '-'
+  mcap             = get_out_str(float(stock_info['marketCap'])) if not np.isnan(stock_info['marketCap']) else '-'
+
+  print(avgVol, mcap, percent_short, percFloat, business_name, fwdPE, currency, PEG)
+
+  # # [Maybe in future]
+  # business_summary = stock_info['longBusinessSummary'] if not np.isnan(stock_info['longBusinessSummary']) else '-'
+  # book_val         = stock_info['bookValue'] if not np.isnan(stock_info['bookValue']) else '-'
+  # pb               = stock_info['priceToBook'] if not np.isnan(stock_info['priceToBook']) else '-'
+  # ttm_PS           = stock_info['priceToSalesTrailing12Months'] if not np.isnan(stock_info['priceToSalesTrailing12Months']) else '-'
+  # total_debt       = stock_info['totalDebt'] if not np.isnan(stock_info['totalDebt']) else '-'
+  # ROA              = stock_info['returnOnAssets'] if not np.isnan(stock_info['returnOnAssets']) else '-'
+  # ROE              = stock_info['returnOnEquity'] if not np.isnan(stock_info['returnOnEquity']) else '-'
 
   if 'forwardPE' in stock_info and 'pegRatio' in stock_info:
-    if np.isnan(stock_info['forwardPE']) or np.isnan(stock_info['pegRatio']):
+    if np.isnan(fwdPE) or np.isnan(PEG):
       analyst_growth = '-'
-    elif stock_info['pegRatio'] == 0.0:
+    elif PEG == 0.0:
       analyst_growth = '-'
     else:
-      analyst_growth  = str(round(stock_info['forwardPE'] / stock_info['pegRatio'], 2))+'%'
+      analyst_growth  = str(round(fwdPE / PEG, 2))+'%'
   else:
     analyst_growth = '-'
 
