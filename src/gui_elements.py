@@ -32,12 +32,27 @@ def get_text_entry_box(label, font_size, bold=False, readOnly=False):
 	field_text.setFont(font)
 	if bold: field_text.setStyleSheet("font-weight: bold")
 	field_entry = QLineEdit()
+	field_entry.setFixedWidth(120)
 	field_entry.setFont(font)
 	if bold: field_entry.setStyleSheet("font-weight: bold")
 	if readOnly: field_entry.setReadOnly(True)
 	layout.addWidget(field_text, alignment=Qt.AlignRight)
 	layout.addWidget(field_entry, alignment=Qt.AlignLeft)
 	return field_entry, layout
+
+def get_text_entry_box_two(label, font_size, bold=False, readOnly=False):
+	field_text = QLabel(label)
+	font = QFont(font_name, font_size)
+	font.setStyleHint(QFont.Monospace)
+	font.setPointSize(font_size)
+	field_text.setFont(font)
+	if bold: field_text.setStyleSheet("font-weight: bold")
+	field_entry = QLineEdit()
+	field_entry.setFixedWidth(120)
+	field_entry.setFont(font)
+	if bold: field_entry.setStyleSheet("font-weight: bold")
+	if readOnly: field_entry.setReadOnly(True)
+	return field_entry, field_text
 
 def get_dark_mode_toggle_button(funct):
 	theme_layout = QGridLayout()

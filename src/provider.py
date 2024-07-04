@@ -10,6 +10,9 @@ import yfinance as yf
 import os, csv, time
 from tabulate import tabulate
 from scipy.optimize import minimize_scalar
+import functools
+
+currency_symbols = {'USD':'$', 'JPY':'¥', 'AUD':'$', 'NZD':'$', 'EUR':'€', 'GBP':'£', 'ARS':'$', 'HKD':'$', 'INR':'₹', 'CAD':'$', 'MXN':'$', 'IDR':'Rp.', 'SGD':'$'}
 
 def get_out_str(num):
   if num is np.isnan(num): return num
@@ -19,6 +22,7 @@ def get_out_str(num):
   elif num > 1000000000000.0: return str(np.round(num/1000000000000.0, 2))+'T'
   return num
 
+@functools.cache
 def get_info(ticker):
   stock      = yf.Ticker(ticker)
   income     = stock.income_stmt
@@ -38,16 +42,14 @@ def get_info(ticker):
   # 3 years, 2 years, 1 year
   def get_margins(r, fcf):
     results = []
-    if len(r) != len(fcf):
-      return ['-', '-', '-']
-    else:
-      for i in range(len(r)-1):
-        if np.isnan(fcf[i]) or np.isnan(r[i]):
-          results.append('-')
-        else:
-          results.append(fcf[i]/r[i])
-      results.reverse()
-      return results
+    n = min(len(r), len(fcf))
+    for i in range(n-1):
+      if np.isnan(fcf[i]) or np.isnan(r[i]):
+        results.append('-')
+      else:
+        results.append(fcf[i]/r[i])
+    results.reverse()
+    return results
 
   def make_list(label, ar):
     if len(ar) > 3:
@@ -83,6 +85,7 @@ def get_info(ticker):
   business_name   = stock_info['shortName']
   fwdPE           = np.round(stock_info['forwardPE'], 2) if not np.isnan(stock_info['forwardPE']) else '-'
   currency        = stock_info['currency']
+  pre_elem        = currency_symbols[currency]
   PEG             = stock_info['pegRatio'] if not np.isnan(stock_info['pegRatio']) else '-'
 
   # float % of total shares outstanding
@@ -94,11 +97,10 @@ def get_info(ticker):
 
   # Covert all these to Thousands, Millions or Billions if not in tens
   avgVol           = get_out_str(float(stock_info['averageVolume'])) if not np.isnan(stock_info['averageVolume']) else '-'
-  mcap             = get_out_str(float(stock_info['marketCap'])) if not np.isnan(stock_info['marketCap']) else '-'
+  mcap             = pre_elem+get_out_str(float(stock_info['marketCap'])) if not np.isnan(stock_info['marketCap']) else '-'
 
-  # --------------------------
-  # Need to get percFloat, total_shares, latest_revenue, currency, business_name, and avgVol, mcap, and percent_short across to GUI.
-  # --------------------------
+  # For populating stock related data
+  extra_info = [pre_elem+get_out_str(starting_rev), get_out_str(total_shares), percFloat, percent_short, avgVol, mcap]
   
   # # [Maybe in future]
   # business_summary = stock_info['longBusinessSummary'] if not np.isnan(stock_info['longBusinessSummary']) else '-'
@@ -119,13 +121,13 @@ def get_info(ticker):
   else:
     analyst_growth = '-'
 
-  header = ['$'+ticker, '3 Years', '2 Years', '1 Year']
+  header = [business_name+' ({})'.format(currency), '3 Years', '2 Years', '1 Year']
   table_data = []
   table_data.append(make_list('Revenue Growth', rev_growth))
   table_data.append(make_list('Dilution(+)/Buybacks(-)', buybacks))
   table_data.append(make_list('FCF Margins', fcf_margins))
   table_data.append(['Analyst Expected Growth (5Y)', analyst_growth, '-', '-'])
-  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, tabulate(table_data, headers=header)
+  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, tabulate(table_data, headers=header), extra_info
 
 def dcf(rev_growth_array, fcf_margins_array, n_future_years, latest_revenue, \
         wacc, tgr, total_shares, current_price, reverse_dcf_mode=False):
