@@ -167,9 +167,10 @@ class DCFApp(QMainWindow):
         output_layout = QGridLayout()
         
         # Main output boxes
-        self.fv_entry, fv_layout = get_text_entry_box("Fair Value:    ", int(1.5*self.font_size), bold=True, readOnly=True)
-        self.cp_entry, cp_layout = get_text_entry_box("Current Price:    ", self.font_size, bold=True, readOnly=True)
-        self.ud_entry, ud_layout = get_text_entry_box("Upside/Downside (%):    ", self.font_size, bold=True, readOnly=True)
+        self.fv_entry, fv_layout = get_text_entry_box("Fair Value: ", int(1.5*self.font_size), bold=True, readOnly=True)
+        self.cp_entry, cp_layout = get_text_entry_box("Current Price: ", self.font_size, bold=True, readOnly=True)
+        self.ud_entry, ud_layout = get_text_entry_box("Upside/Downside (%): ", self.font_size, bold=True, readOnly=True)
+        self.erev_entry, erev_layout = get_text_entry_box("Yearly Revenue After N Years: ", self.font_size, bold=True, readOnly=True)
 
         # Start of reverse DCF outputs
         self.rev_dcf_start = get_label("\nTo Justify the Current Price", self.font_size, bold=True)
@@ -198,7 +199,8 @@ class DCFApp(QMainWindow):
         output_layout.addLayout(fv_layout, 0, 0)
         output_layout.addLayout(cp_layout, 1, 0)
         output_layout.addLayout(ud_layout, 2, 0)
-        output_layout.addLayout(rev_dcf_layout, 3, 0)
+        output_layout.addLayout(erev_layout, 3, 0)
+        output_layout.addLayout(rev_dcf_layout, 4, 0)
 
         # Finalize output frame
         self.output_frame.setLayout(output_layout)
@@ -248,6 +250,7 @@ class DCFApp(QMainWindow):
             self.perc_short_entry.clear()
             self.avg_vol_entry.clear()
             self.mcap_entry.clear()
+            self.erev_entry.clear()
             current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, info_str, extra_info = get_info(ticker)
             lines = info_str.splitlines()
             lines[-1] = lines[-1] + '     '
@@ -256,6 +259,13 @@ class DCFApp(QMainWindow):
                 self.info_text.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
             results = dcf(rev_growth_rate, fcf_margin, nyears, starting_rev, wacc, tgr, total_shares, current_price)
             fair_value, req_rg, req_wacc, req_fcf, curr_rev_growth = results
+            final_rev = extra_info[-1] + get_out_str(starting_rev*(1+rev_growth_rate)**(float(nyears))) # Revenue after N years
+            self.curr_rev_entry.setText(extra_info[0])
+            self.total_shares_entry.setText(extra_info[1])
+            self.perc_float_entry.setText(extra_info[2])
+            self.perc_short_entry.setText(extra_info[3])
+            self.avg_vol_entry.setText(extra_info[4])
+            self.mcap_entry.setText(extra_info[5])
             self.fv_entry.setText("$"+str(fair_value))
             self.cp_entry.setText("$"+str(current_price))
             self.ud_entry.setText(str(calc_up_downside(fair_value, current_price))+"%")
@@ -263,6 +273,7 @@ class DCFApp(QMainWindow):
             self.rrev_entry.setText(str(req_rg))
             self.rfcf_entry.setText(str(req_fcf))
             self.rwacc_entry.setText(str(req_wacc))
+            self.erev_entry.setText(final_rev)
         except Exception as e:
             self.fv_entry.setText(f"Error")
 
@@ -284,6 +295,7 @@ class DCFApp(QMainWindow):
         self.perc_short_entry.clear()
         self.avg_vol_entry.clear()
         self.mcap_entry.clear()
+        self.erev_entry.clear()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

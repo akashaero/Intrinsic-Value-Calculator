@@ -100,7 +100,7 @@ def get_info(ticker):
   mcap             = pre_elem+get_out_str(float(stock_info['marketCap'])) if not np.isnan(stock_info['marketCap']) else '-'
 
   # For populating stock related data
-  extra_info = [pre_elem+get_out_str(starting_rev), get_out_str(total_shares), percFloat, percent_short, avgVol, mcap]
+  extra_info = [pre_elem+get_out_str(starting_rev), get_out_str(total_shares), percFloat, percent_short, avgVol, mcap, pre_elem]
   
   # # [Maybe in future]
   # business_summary = stock_info['longBusinessSummary'] if not np.isnan(stock_info['longBusinessSummary']) else '-'

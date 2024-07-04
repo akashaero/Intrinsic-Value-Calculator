@@ -67,7 +67,7 @@ fcf_margin       = args.fcf_margin[0]/100.  # fcf_m
 term_growth_rate = args.tgr/100.            # tgr (OPTIONAL)
 
 # Get required data and run DCF. Print results immediately if not running in batch mode
-current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, data = get_info(ticker)
+current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, data, extra_info = get_info(ticker)
 print(data, '\n')
 results = dcf(rev_growth_rate, fcf_margin, n_future_years, starting_rev, discount_rate, term_growth_rate, total_shares, current_price)
 
