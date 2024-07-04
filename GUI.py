@@ -13,6 +13,8 @@ model given,
 Also provides reverse DCF functionality where the required revenue growth rate, 
 free cash flow margin, and rate of return are calculated based on current stock 
 price.
+
+pyinstaller.exe GUI.py --clean --onedir -i logo/icon.ico --noconsole --exclude-module PyQt6 --name Intrinsic-Value-Calculator-OS
 '''
 
 import sys
