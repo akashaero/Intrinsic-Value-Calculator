@@ -39,7 +39,6 @@ Stock_Ticker  , Rev_Growth_Estimate, FCF_Margin_Estimate
 '''
 
 import numpy as np
-import yfinance as yf
 import argparse
 import csv, time
 import pandas as pd

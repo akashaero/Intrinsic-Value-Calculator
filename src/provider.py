@@ -8,10 +8,21 @@ Provides important utilities to main programs for stock valuation
 import numpy as np
 import yfinance as yf
 import os, csv, time
-import pandas as pd
 from tabulate import tabulate
 from scipy.optimize import minimize_scalar
+import functools
 
+currency_symbols = {'USD':'$', 'JPY':'¥', 'AUD':'$', 'NZD':'$', 'EUR':'€', 'GBP':'£', 'ARS':'$', 'HKD':'$', 'INR':'₹', 'CAD':'$', 'MXN':'$', 'IDR':'Rp.', 'SGD':'$'}
+
+def get_out_str(num):
+  if num is np.isnan(num): return num
+  elif num > 1000.0 and num < 1000000.0: return str(np.round(num/1000.0, 2))+'K'
+  elif num > 1000000.0 and num < 1000000000.0: return str(np.round(num/1000000.0, 2))+'M'
+  elif num > 1000000000.0 and num < 1000000000000.0: return str(np.round(num/1000000000.0, 2))+'B'
+  elif num > 1000000000000.0: return str(np.round(num/1000000000000.0, 2))+'T'
+  return num
+
+@functools.cache
 def get_info(ticker):
   stock      = yf.Ticker(ticker)
   income     = stock.income_stmt
@@ -31,16 +42,14 @@ def get_info(ticker):
   # 3 years, 2 years, 1 year
   def get_margins(r, fcf):
     results = []
-    if len(r) != len(fcf):
-      return ['-', '-', '-']
-    else:
-      for i in range(len(r)-1):
-        if np.isnan(fcf[i]) or np.isnan(r[i]):
-          results.append('-')
-        else:
-          results.append(fcf[i]/r[i])
-      results.reverse()
-      return results
+    n = min(len(r), len(fcf))
+    for i in range(n-1):
+      if np.isnan(fcf[i]) or np.isnan(r[i]):
+        results.append('-')
+      else:
+        results.append(fcf[i]/r[i])
+    results.reverse()
+    return results
 
   def make_list(label, ar):
     if len(ar) > 3:
@@ -72,23 +81,53 @@ def get_info(ticker):
   fcf_margins     = get_margins(income.loc['Total Revenue'], cashflow.loc['Free Cash Flow'])
   prev_rev_growth = rev_growth[-1]
   prev_fcf_margin = fcf_margins[-1]
+
+  business_name   = stock_info['shortName']
+  fwdPE           = np.round(stock_info['forwardPE'], 2) if not np.isnan(stock_info['forwardPE']) else '-'
+  currency        = stock_info['currency']
+  pre_elem        = currency_symbols[currency]
+  PEG             = stock_info['pegRatio'] if not np.isnan(stock_info['pegRatio']) else '-'
+
+  # float % of total shares outstanding
+  floatShares      = stock_info['floatShares'] if not np.isnan(stock_info['floatShares']) else '-'
+  if total_shares != '-' and floatShares != '-':
+    percFloat = str(np.round(100.*(floatShares / total_shares), 2))+'%'
+  
+  percent_short = str(np.round(stock_info['shortPercentOfFloat']*100., 2))+'%' if not np.isnan(stock_info['shortPercentOfFloat']) else '-'
+
+  # Covert all these to Thousands, Millions or Billions if not in tens
+  avgVol           = get_out_str(float(stock_info['averageVolume'])) if not np.isnan(stock_info['averageVolume']) else '-'
+  mcap             = pre_elem+get_out_str(float(stock_info['marketCap'])) if not np.isnan(stock_info['marketCap']) else '-'
+
+  # For populating stock related data
+  extra_info = [pre_elem+get_out_str(starting_rev), get_out_str(total_shares), percFloat, percent_short, avgVol, mcap, pre_elem]
+  
+  # # [Maybe in future]
+  # business_summary = stock_info['longBusinessSummary'] if not np.isnan(stock_info['longBusinessSummary']) else '-'
+  # book_val         = stock_info['bookValue'] if not np.isnan(stock_info['bookValue']) else '-'
+  # pb               = stock_info['priceToBook'] if not np.isnan(stock_info['priceToBook']) else '-'
+  # ttm_PS           = stock_info['priceToSalesTrailing12Months'] if not np.isnan(stock_info['priceToSalesTrailing12Months']) else '-'
+  # total_debt       = stock_info['totalDebt'] if not np.isnan(stock_info['totalDebt']) else '-'
+  # ROA              = stock_info['returnOnAssets'] if not np.isnan(stock_info['returnOnAssets']) else '-'
+  # ROE              = stock_info['returnOnEquity'] if not np.isnan(stock_info['returnOnEquity']) else '-'
+
   if 'forwardPE' in stock_info and 'pegRatio' in stock_info:
-    if np.isnan(stock_info['forwardPE']) or np.isnan(stock_info['pegRatio']):
+    if np.isnan(fwdPE) or np.isnan(PEG):
       analyst_growth = '-'
-    elif stock_info['pegRatio'] == 0.0:
+    elif PEG == 0.0:
       analyst_growth = '-'
     else:
-      analyst_growth  = str(round(stock_info['forwardPE'] / stock_info['pegRatio'], 2))+'%'
+      analyst_growth  = str(round(fwdPE / PEG, 2))+'%'
   else:
     analyst_growth = '-'
 
-  header = ['$'+ticker, '3 Years', '2 Years', '1 Year']
+  header = [business_name+' ({})'.format(currency), '3 Years', '2 Years', '1 Year']
   table_data = []
   table_data.append(make_list('Revenue Growth', rev_growth))
   table_data.append(make_list('Dilution(+)/Buybacks(-)', buybacks))
   table_data.append(make_list('FCF Margins', fcf_margins))
   table_data.append(['Analyst Expected Growth (5Y)', analyst_growth, '-', '-'])
-  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, tabulate(table_data, headers=header)
+  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, tabulate(table_data, headers=header), extra_info
 
 def dcf(rev_growth_array, fcf_margins_array, n_future_years, latest_revenue, \
         wacc, tgr, total_shares, current_price, reverse_dcf_mode=False):
