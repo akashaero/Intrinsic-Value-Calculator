@@ -72,7 +72,7 @@ def get_info(ticker):
   starting_fcf    = float(cashflow.loc['Free Cash Flow'][0]) if not np.isnan(cashflow.loc['Free Cash Flow'][0]) else '-'
   starting_rev    = float(income.loc['Total Revenue'][0]) if not np.isnan(income.loc['Total Revenue'][0]) else '-'
   FCF_Margin      = round(100*starting_fcf / starting_rev, 2) if not starting_fcf == '-' or not starting_rev == '-' else '-'
-  current_price   = round(stock_info['previousClose'], 2)
+  current_price   = round(stock_info['currentPrice'], 2)
   total_shares    = stock_info['sharesOutstanding'] if 'sharesOutstanding' in stock_info else income.loc['Basic Average Shares'][0]
   starting_rev    = income.loc['Total Revenue'][0]
   rev_growth      = get_rates(income.loc['Total Revenue'])
