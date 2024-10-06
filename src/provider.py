@@ -12,7 +12,8 @@ from tabulate import tabulate
 from scipy.optimize import minimize_scalar
 import functools
 
-currency_symbols = {'USD':'$', 'JPY':'¥', 'AUD':'$', 'NZD':'$', 'EUR':'€', 'GBP':'£', 'ARS':'$', 'HKD':'$', 'INR':'₹', 'CAD':'$', 'MXN':'$', 'IDR':'Rp.', 'SGD':'$'}
+currency_symbols = {'USD':'$', 'JPY':'¥', 'AUD':'$', 'NZD':'$', 'EUR':'€', 'GBP':'£', 'ARS':'$', 'HKD':'$', 'INR':'₹', 'CAD':'$', 'MXN':'$', 'IDR':'Rp.', 'SGD':'$', 'CNY':'CN¥'}
+conversion_multiples = {'USD':1.0, 'JPY':yf.Ticker('JPY=X').info['previousClose'], 'AUD':(1.0/yf.Ticker('AUDUSD=X').info['previousClose']), 'NZD':(1.0/yf.Ticker('NZDUSD=X').info['previousClose']), 'EUR':(1.0/yf.Ticker('EURUSD=X').info['previousClose']), 'GBP':(1.0/yf.Ticker('GBPUSD=X').info['previousClose']), 'ARS':yf.Ticker('ARS=X').info['previousClose'], 'HKD':yf.Ticker('HKD=X').info['previousClose'], 'INR':yf.Ticker('INR=X').info['previousClose'], 'CAD':yf.Ticker('CAD=X').info['previousClose'], 'MXN':yf.Ticker('MXN=X').info['previousClose'], 'IDR':yf.Ticker('IDR=X').info['previousClose'], 'SGD':yf.Ticker('SGD=X').info['previousClose'], 'CNY':yf.Ticker('CNY=X').info['previousClose']}
 
 def get_out_str(num):
   if num is np.isnan(num): return num
@@ -72,7 +73,7 @@ def get_info(ticker):
   starting_fcf    = float(cashflow.loc['Free Cash Flow'][0]) if not np.isnan(cashflow.loc['Free Cash Flow'][0]) else '-'
   starting_rev    = float(income.loc['Total Revenue'][0]) if not np.isnan(income.loc['Total Revenue'][0]) else '-'
   FCF_Margin      = round(100*starting_fcf / starting_rev, 2) if not starting_fcf == '-' or not starting_rev == '-' else '-'
-  current_price   = round(stock_info['currentPrice'], 2)
+  current_price   = round(stock_info['currentPrice'] / conversion_multiples[stock_info['currency']], 2)
   total_shares    = stock_info['sharesOutstanding'] if 'sharesOutstanding' in stock_info else income.loc['Basic Average Shares'][0]
   starting_rev    = income.loc['Total Revenue'][0]
   rev_growth      = get_rates(income.loc['Total Revenue'])
@@ -85,7 +86,7 @@ def get_info(ticker):
   business_name   = stock_info['shortName']
   fwdPE           = np.round(stock_info['forwardPE'], 2) if not np.isnan(stock_info['forwardPE']) else '-'
   currency        = stock_info['currency']
-  pre_elem        = currency_symbols[currency]
+  financial_curr  = stock_info['financialCurrency']
   PEG             = stock_info['pegRatio'] if not np.isnan(stock_info['pegRatio']) else '-'
 
   # float % of total shares outstanding
@@ -97,10 +98,10 @@ def get_info(ticker):
 
   # Covert all these to Thousands, Millions or Billions if not in tens
   avgVol           = get_out_str(float(stock_info['averageVolume'])) if not np.isnan(stock_info['averageVolume']) else '-'
-  mcap             = pre_elem+get_out_str(float(stock_info['marketCap'])) if not np.isnan(stock_info['marketCap']) else '-'
+  mcap             = '$'+get_out_str(float(stock_info['marketCap'] / conversion_multiples[currency])) if not np.isnan(stock_info['marketCap']) else '-'
 
   # For populating stock related data
-  extra_info = [pre_elem+get_out_str(starting_rev), get_out_str(total_shares), percFloat, percent_short, avgVol, mcap, pre_elem]
+  extra_info = ['$'+get_out_str(starting_rev / conversion_multiples[financial_curr]), get_out_str(total_shares), percFloat, percent_short, avgVol, mcap, conversion_multiples[financial_curr]]
   
   # # [Maybe in future]
   # business_summary = stock_info['longBusinessSummary'] if not np.isnan(stock_info['longBusinessSummary']) else '-'
@@ -127,7 +128,7 @@ def get_info(ticker):
   table_data.append(make_list('Dilution(+)/Buybacks(-)', buybacks))
   table_data.append(make_list('FCF Margins', fcf_margins))
   table_data.append(['Analyst Expected Growth (5Y)', analyst_growth, '-', '-'])
-  return current_price, total_shares, prev_rev_growth, starting_rev, prev_fcf_margin, tabulate(table_data, headers=header), extra_info
+  return current_price, total_shares, prev_rev_growth, starting_rev / conversion_multiples[financial_curr], prev_fcf_margin, tabulate(table_data, headers=header), extra_info
 
 def dcf(rev_growth_array, fcf_margins_array, n_future_years, latest_revenue, \
         wacc, tgr, total_shares, current_price, reverse_dcf_mode=False):
