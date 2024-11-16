@@ -12,8 +12,8 @@ from tabulate import tabulate
 from scipy.optimize import minimize_scalar
 import functools
 
-currency_symbols = {'USD':'$', 'JPY':'¥', 'AUD':'$', 'NZD':'$', 'EUR':'€', 'GBP':'£', 'ARS':'$', 'HKD':'$', 'INR':'₹', 'CAD':'$', 'MXN':'$', 'IDR':'Rp.', 'SGD':'$', 'CNY':'CN¥'}
-conversion_multiples = {'USD':1.0, 'JPY':yf.Ticker('JPY=X').info['previousClose'], 'AUD':(1.0/yf.Ticker('AUDUSD=X').info['previousClose']), 'NZD':(1.0/yf.Ticker('NZDUSD=X').info['previousClose']), 'EUR':(1.0/yf.Ticker('EURUSD=X').info['previousClose']), 'GBP':(1.0/yf.Ticker('GBPUSD=X').info['previousClose']), 'ARS':yf.Ticker('ARS=X').info['previousClose'], 'HKD':yf.Ticker('HKD=X').info['previousClose'], 'INR':yf.Ticker('INR=X').info['previousClose'], 'CAD':yf.Ticker('CAD=X').info['previousClose'], 'MXN':yf.Ticker('MXN=X').info['previousClose'], 'IDR':yf.Ticker('IDR=X').info['previousClose'], 'SGD':yf.Ticker('SGD=X').info['previousClose'], 'CNY':yf.Ticker('CNY=X').info['previousClose']}
+currency_symbols = {'USD':'$', 'JPY':'¥', 'AUD':'$', 'NZD':'$', 'EUR':'€', 'GBP':'£', 'ARS':'$', 'HKD':'$', 'INR':'₹', 'CAD':'$', 'MXN':'$', 'IDR':'Rp.', 'SGD':'$', 'CNY':'CN¥', 'TWD':'$'}
+conversion_multiples = {'USD':1.0, 'JPY':yf.Ticker('JPY=X').info['previousClose'], 'AUD':(1.0/yf.Ticker('AUDUSD=X').info['previousClose']), 'NZD':(1.0/yf.Ticker('NZDUSD=X').info['previousClose']), 'EUR':(1.0/yf.Ticker('EURUSD=X').info['previousClose']), 'GBP':(1.0/yf.Ticker('GBPUSD=X').info['previousClose']), 'ARS':yf.Ticker('ARS=X').info['previousClose'], 'HKD':yf.Ticker('HKD=X').info['previousClose'], 'INR':yf.Ticker('INR=X').info['previousClose'], 'CAD':yf.Ticker('CAD=X').info['previousClose'], 'MXN':yf.Ticker('MXN=X').info['previousClose'], 'IDR':yf.Ticker('IDR=X').info['previousClose'], 'SGD':yf.Ticker('SGD=X').info['previousClose'], 'CNY':yf.Ticker('CNY=X').info['previousClose'], 'TWD':yf.Ticker('TWD=X').info['previousClose']}
 
 def get_out_str(num):
   if num is np.isnan(num): return num
