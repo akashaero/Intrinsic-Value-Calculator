@@ -261,7 +261,8 @@ class DCFApp(QMainWindow):
                 self.info_text.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
             results = dcf(rev_growth_rate, fcf_margin, nyears, starting_rev, wacc, tgr, total_shares, current_price)
             fair_value, req_rg, req_wacc, req_fcf, curr_rev_growth = results
-            final_rev = extra_info[-1] + get_out_str(starting_rev*(1+rev_growth_rate)**(float(nyears))) # Revenue after N years
+            fair_value = np.round(fair_value / extra_info[-1], 2)
+            final_rev = '$' + get_out_str((starting_rev/extra_info[-1])*(1+rev_growth_rate)**(float(nyears))) # Revenue after N years
             self.curr_rev_entry.setText(extra_info[0])
             self.total_shares_entry.setText(extra_info[1])
             self.perc_float_entry.setText(extra_info[2])
