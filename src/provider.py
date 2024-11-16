@@ -87,7 +87,7 @@ def get_info(ticker):
   fwdPE           = np.round(stock_info['forwardPE'], 2) if not np.isnan(stock_info['forwardPE']) else '-'
   currency        = stock_info['currency']
   financial_curr  = stock_info['financialCurrency']
-  PEG             = stock_info['pegRatio'] if not np.isnan(stock_info['pegRatio']) else '-'
+  PEG             = stock_info['trailingPegRatio'] if not np.isnan(stock_info['trailingPegRatio'] if 'trailingPegRatio' in stock_info else np.nan) else '-'
 
   # float % of total shares outstanding
   floatShares      = stock_info['floatShares'] if not np.isnan(stock_info['floatShares']) else '-'
@@ -112,7 +112,7 @@ def get_info(ticker):
   # ROA              = stock_info['returnOnAssets'] if not np.isnan(stock_info['returnOnAssets']) else '-'
   # ROE              = stock_info['returnOnEquity'] if not np.isnan(stock_info['returnOnEquity']) else '-'
 
-  if 'forwardPE' in stock_info and 'pegRatio' in stock_info:
+  if 'forwardPE' in stock_info and 'trailingPegRatio' in stock_info:
     if np.isnan(fwdPE) or np.isnan(PEG):
       analyst_growth = '-'
     elif PEG == 0.0:
