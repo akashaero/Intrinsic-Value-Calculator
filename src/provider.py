@@ -23,6 +23,12 @@ def get_out_str(num):
   elif num > 1000000000000.0: return str(np.round(num/1000000000000.0, 2))+'T'
   return num
 
+def not_a_float(num):
+  if not type(num) == float:
+    return True
+  else:
+    return False
+
 @functools.cache
 def get_info(ticker):
   stock      = yf.Ticker(ticker)
@@ -87,7 +93,9 @@ def get_info(ticker):
   fwdPE           = np.round(stock_info['forwardPE'], 2) if not np.isnan(stock_info['forwardPE']) else '-'
   currency        = stock_info['currency']
   financial_curr  = stock_info['financialCurrency']
-  PEG             = stock_info['trailingPegRatio'] if not np.isnan(stock_info['trailingPegRatio'] if 'trailingPegRatio' in stock_info else np.nan) else '-'
+  PEG             = stock_info['trailingPegRatio'] if type(stock_info['trailingPegRatio']) == float else '-'
+  
+  # if not np.isnan(stock_info['trailingPegRatio'] if 'trailingPegRatio' in stock_info else np.nan) else '-'
 
   # float % of total shares outstanding
   floatShares      = stock_info['floatShares'] if not np.isnan(stock_info['floatShares']) else '-'
@@ -113,7 +121,7 @@ def get_info(ticker):
   # ROE              = stock_info['returnOnEquity'] if not np.isnan(stock_info['returnOnEquity']) else '-'
 
   if 'forwardPE' in stock_info and 'trailingPegRatio' in stock_info:
-    if np.isnan(fwdPE) or np.isnan(PEG):
+    if not_a_float(fwdPE) or not_a_float(PEG):
       analyst_growth = '-'
     elif PEG == 0.0:
       analyst_growth = '-'
