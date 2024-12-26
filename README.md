@@ -34,7 +34,7 @@ Some quick notes. DCF models do not value bank stocks well. For banks, multiples
 - [Contributing](#contributing)
 - [License](#license)
 
-## Graphical User Interface ([Download for Windows](https://github.com/akashaero/Intrinsic-Value-Calculator/releases/download/v0.2.0/Intrinsic-Value-Calculator-Windows.zip)) ([Download for Linux](https://github.com/akashaero/Intrinsic-Value-Calculator/releases/download/v0.2.0/Intrinsic-Value-Calculator-Linux))
+## Graphical User Interface ([Download for Windows](https://github.com/akashaero/Intrinsic-Value-Calculator/releases/download/v0.3.0/Intrinsic-Value-Calculator-Windows.zip)) ([Download for Linux](https://github.com/akashaero/Intrinsic-Value-Calculator/releases/download/v0.3.0/Intrinsic-Value-Calculator-Linux.tar.gz))
 Introducing the new graphical user interface (GUI) for Intrinsic Value Calculator tool that is cross-plateform and is distributed as an executable for users who want to get straight to the company fair value calculations! Please find that executable package here. Alternatively, users who want run the program and GUI using terminal can follow the next steps in the readme file. Here's what the GUI looks like (yes, there is a dark mode!).
 
 ![dm](logo/GUI_DM.png "Graphical User Interface in Dark Mode")
