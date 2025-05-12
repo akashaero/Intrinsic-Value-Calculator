@@ -33,6 +33,7 @@ or
 $ python get_fair_value.py INTC 12.2 20 --N 7 --rrr 10 --tgr 2.5 -S
 '''
 
+# test branch modifications only  
 
 from scipy.optimize import minimize_scalar
 import argparse
