@@ -33,6 +33,8 @@ or
 $ python get_fair_value.py INTC 12.2 20 --N 7 --rrr 10 --tgr 2.5 -S
 '''
 
+# test only for version control using git
+
 from scipy.optimize import minimize_scalar
 import argparse
 from src.provider import *
